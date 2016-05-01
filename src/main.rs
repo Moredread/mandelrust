@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate timeit;
 extern crate rust_mpfr;
 
 use rust_mpfr::mpfr::Mpfr;
@@ -45,11 +47,24 @@ fn main() {
 
     let c = canvas_size { pixel_width: 1024, pixel_height: 1024, top: 1.0, bottom: -1.0, left: -2.0, right: 1.0 };
 
-    let (x, y) = c.coordinates(1024, 1024);
+    let max = 10000;
 
-    let max = 1000000;
-    let i = iterate::<Mpfr>(Mpfr::from(0.0f64), Mpfr::from(0.0f64), max).unwrap_or(0);
-    let i2 = iterate::<f64>(0.0f64, 0.0f64, max).unwrap_or(0);
+    timeit!({
+        let x_ = Mpfr::new2_from_str(1024, "0.0", 10).unwrap();
+        let y_ = x_.clone();
 
-    println!("Hello, world! {} {} {} {} {}", v, x, y, i, i2);
+        iterate::<Mpfr>(x_, y_, max);
+    });
+
+    timeit!({
+        let x_ = Mpfr::new2_from_str(1024000, "0.0", 10).unwrap();
+        let y_ = x_.clone();
+
+        iterate::<Mpfr>(x_, y_, max);
+    });
+
+    timeit!({
+        iterate::<f64>(0.0f64, 0.0f64, max).unwrap_or(0);
+    });
+
 }
