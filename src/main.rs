@@ -1,6 +1,7 @@
 extern crate rust_mpfr;
 
 use rust_mpfr::mpfr::Mpfr;
+use std::ops::{Mul, Add, Neg, Sub};
 
 #[derive(Copy, Clone)]
 struct canvas_size {
@@ -20,14 +21,15 @@ impl canvas_size {
     }
 }
 
-fn iterate(x0: f64, y0: f64, max_iterations: u32) -> Option<u32> {
+fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64> + Clone + PartialOrd>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
+{
     let mut i = 1;
-    let mut x = x0;
-    let mut y = y0;
+    let mut x = x0.clone();
+    let mut y = y0.clone();
 
-    while (x * x + y * y < 4.0) && (i < max_iterations) {
-        let xtemp = x * x - y * y + x0;
-        y = 2.0 * x * y + y0;
+    while x.clone() * x.clone() + y.clone() * y.clone() < T::from(4.0f64) && (i < max_iterations) {
+        let xtemp = x.clone() * x.clone() - y.clone() * y.clone() + x0.clone();
+        y = (T::from(2.0f64)) * x * y + y0.clone();
         x = xtemp;
         i += 1;
     }
@@ -46,7 +48,8 @@ fn main() {
     let (x, y) = c.coordinates(1024, 1024);
 
     let max = 1000000;
-    let i = iterate(0.0, 0.0, max).unwrap_or(0);
+    let i = iterate::<Mpfr>(Mpfr::from(0.0f64), Mpfr::from(0.0f64), max).unwrap_or(0);
+    let i2 = iterate::<f64>(0.0f64, 0.0f64, max).unwrap_or(0);
 
-    println!("Hello, world! {} {} {} {}", v, x, y, i);
+    println!("Hello, world! {} {} {} {} {}", v, x, y, i, i2);
 }
