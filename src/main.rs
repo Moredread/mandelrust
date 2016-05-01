@@ -1,7 +1,9 @@
 #[macro_use]
 extern crate timeit;
 extern crate rust_mpfr;
+extern crate pbr;
 
+use pbr::ProgressBar;
 use rust_mpfr::mpfr::Mpfr;
 use std::ops::{Mul, Add, Neg, Sub};
 
@@ -31,6 +33,10 @@ impl canvas_size {
         let x = (idx as u32) - y * self.pixel_width;
         (x, y)
     }
+
+    fn pixel_count(&self) -> u32 {
+        self.pixel_width * self.pixel_height
+    }
 }
 
 fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64> + Clone + PartialOrd>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
@@ -58,6 +64,19 @@ fn main() {
     let c = canvas_size { pixel_width: 1024, pixel_height: 1024, top: 1.0, bottom: -1.0, left: -2.0, right: 1.0 };
 
     let max = 10000;
+
+    let mut v = Vec::<u32>::with_capacity(c.pixel_count() as usize);
+
+    let mut pb = ProgressBar::new(c.pixel_count() as u64);
+//    pb.format("╢▌▌░╟");
+
+    for i in 0..c.pixel_count() {
+        let (p_x, p_y) = c.idx_to_coord(i as usize);
+        let (x, y) = c.coordinates(p_x, p_y);
+
+        v.push(iterate::<f64>(x, y, max).unwrap_or(0));
+        if i % c.pixel_height == 0 { pb.add(c.pixel_height as u64); };
+    }
 
     timeit!({
         let x_ = Mpfr::new2_from_str(1024, "0.0", 10).unwrap();

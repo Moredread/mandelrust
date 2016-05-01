@@ -6,3 +6,5 @@ authors = ["André-Patrick Bubel <code@andre-bubel.de>"]
 [dependencies]
 rust-mpfr = "*"
 timeit = "*"
+image = "*"
+pbr = "*"
