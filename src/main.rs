@@ -21,6 +21,16 @@ impl canvas_size {
         let y_ = self.top + (self.bottom - self.top) * (y as f64) / (self.pixel_height as f64);
         return (x_, y_);
     }
+
+    fn coord_to_idx(&self, x: u32, y: u32) -> usize {
+        (self.pixel_width * y + x) as usize
+    }
+
+    fn idx_to_coord(&self, idx: usize) -> (u32, u32) {
+        let y = (idx as u32) % self.pixel_width;
+        let x = (idx as u32) - y * self.pixel_width;
+        (x, y)
+    }
 }
 
 fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64> + Clone + PartialOrd>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
