@@ -1,0 +1,7 @@
+[package]
+name = "mandelrust"
+version = "0.1.0"
+authors = ["André-Patrick Bubel <code@andre-bubel.de>"]
+
+[dependencies]
+rust-mpfr = "*"
