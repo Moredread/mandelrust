@@ -9,7 +9,6 @@ use palette::{Rgb, Hsv, Gradient, IntoColor};
 use std::fs::File;
 use std::path::Path;
 use pbr::ProgressBar;
-use rust_mpfr::mpfr::Mpfr;
 use std::ops::{Mul, Add, Neg, Sub};
 
 #[derive(Copy, Clone)]
@@ -74,7 +73,9 @@ fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
         let (x, y) = canvas_size.coordinates(p_x, p_y);
 
         v.push(iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations));
-        if i % canvas_size.pixel_height == 0 && i != 0 { pb.add(canvas_size.pixel_height as u64); };
+        if i % canvas_size.pixel_height == 0 && i != 0 {
+            pb.add(canvas_size.pixel_height as u64);
+        };
     }
 
     v
@@ -87,7 +88,7 @@ fn main() {
         top: 1.0,
         bottom: -1.0,
         left: -2.0,
-        right: 1.0
+        right: 1.0,
     };
     let max = 256u32;
 
@@ -96,10 +97,8 @@ fn main() {
 
     let n_colors = 256u32;
 
-    let grad = Gradient::new(vec![
-        Hsv::from(Rgb::new(1.0f32, 0.1, 0.1)),
-        Hsv::from(Rgb::new(0.1, 1.0, 1.0))
-    ]);
+    let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.1, 0.1)),
+                                  Hsv::from(Rgb::new(0.1, 1.0, 1.0))]);
 
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let i = v[c.coord_to_idx(x, y)];
