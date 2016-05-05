@@ -3,7 +3,9 @@ extern crate timeit;
 extern crate rust_mpfr;
 extern crate pbr;
 extern crate image;
+extern crate palette;
 
+use palette::{Rgb, Hsv, Gradient, IntoColor};
 use std::fs::File;
 use std::path::Path;
 use pbr::ProgressBar;
@@ -11,7 +13,7 @@ use rust_mpfr::mpfr::Mpfr;
 use std::ops::{Mul, Add, Neg, Sub};
 
 #[derive(Copy, Clone)]
-struct canvas_size {
+struct CanvasSize {
     pixel_width: u32,
     pixel_height: u32,
     top: f64,
@@ -20,7 +22,7 @@ struct canvas_size {
     right: f64,
 }
 
-impl canvas_size {
+impl CanvasSize {
     fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
         let x_ = self.left + (self.right - self.left) * (x as f64) / (self.pixel_width as f64);
         let y_ = self.top + (self.bottom - self.top) * (y as f64) / (self.pixel_height as f64);
@@ -63,45 +65,10 @@ fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64> + 
     }
 }
 
-fn main() {
-    let v: Mpfr = From::<f64>::from(1.234567);
+fn time_stuff() {
+   let max = 256u32;
 
-    let c = canvas_size { pixel_width: 1280, pixel_height: 1280, top: 1.0, bottom: -1.0, left: -2.0, right: 1.0 };
-
-    let max = 256u32;
-
-    let mut v = Vec::<u32>::with_capacity(c.pixel_count() as usize);
-
-    let mut pb = ProgressBar::new(c.pixel_count() as u64);
-//    pb.format("╢▌▌░╟");
-
-    for i in 0..c.pixel_count() {
-        let (p_x, p_y) = c.idx_to_coord(i as usize);
-        let (x, y) = c.coordinates(p_x, p_y);
-
-//        println!("{} {} {} {} {}", i, p_x, p_y, x, y);
-
-        v.push(iterate::<f64>(x, y, max).unwrap_or(max));
-        if i % c.pixel_height == 0 && i != 0 { pb.add(c.pixel_height as u64); };
-    }
-
-    // Create a new ImgBuf with width: imgx and height: imgy
-    let mut imgbuf = image::ImageBuffer::new(c.pixel_width, c.pixel_height);
-
-    // Iterate over the coordiantes and pixels of the image
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let i = v[c.coord_to_idx(x, y)];
-//        println!("{} {} {}", x, y, i);
-        *pixel = image::Luma([i as u8]);
-    }
-
-    // Save the image as “fractal.png”
-    let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
-
-    // We must indicate the image’s color type and what format to save as
-    let _ = image::ImageLuma8(imgbuf).save(fout, image::PNG);
-
-    timeit!({
+   timeit!({
         let x_ = Mpfr::new2_from_str(1024, "0.0", 10).unwrap();
         let y_ = x_.clone();
 
@@ -118,5 +85,54 @@ fn main() {
     timeit!({
         iterate::<f64>(0.0f64, 0.0f64, max).unwrap_or(0);
     });
+}
 
+fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
+    let mut v = Vec::<u32>::with_capacity(canvas_size.pixel_count() as usize);
+    let mut pb = ProgressBar::new(canvas_size.pixel_count() as u64);
+
+    for i in 0..canvas_size.pixel_count() {
+        let (p_x, p_y) = canvas_size.idx_to_coord(i as usize);
+        let (x, y) = canvas_size.coordinates(p_x, p_y);
+
+        v.push(iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations));
+        if i % canvas_size.pixel_height == 0 && i != 0 { pb.add(canvas_size.pixel_height as u64); };
+    }
+
+    v
+}
+
+fn main() {
+    let c = CanvasSize {
+        pixel_width: 1280,
+        pixel_height: 1280,
+        top: 1.0,
+        bottom: -1.0,
+        left: -2.0,
+        right: 1.0
+    };
+    let max = 256u32;
+
+    let v = calculate_all(c, max);
+    let mut imgbuf = image::ImageBuffer::new(c.pixel_width, c.pixel_height);
+
+    let n_colors = 256u32;
+
+    let grad = Gradient::new(vec![
+        Hsv::from(Rgb::new(1.0f32, 0.1, 0.1)),
+        Hsv::from(Rgb::new(0.1, 1.0, 1.0))
+    ]);
+
+    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+        let i = v[c.coord_to_idx(x, y)];
+        let c: [u8; 3] = match i == max {
+            true => [0, 0, 0],
+            false => grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel(),
+        };
+        *pixel = image::Rgb(c);
+    }
+
+    let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
+
+    let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
 }
