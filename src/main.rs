@@ -65,28 +65,6 @@ fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64> + 
     }
 }
 
-fn time_stuff() {
-   let max = 256u32;
-
-   timeit!({
-        let x_ = Mpfr::new2_from_str(1024, "0.0", 10).unwrap();
-        let y_ = x_.clone();
-
-        iterate::<Mpfr>(x_, y_, max);
-    });
-
-    timeit!({
-        let x_ = Mpfr::new2_from_str(1024000, "0.0", 10).unwrap();
-        let y_ = x_.clone();
-
-        iterate::<Mpfr>(x_, y_, max);
-    });
-
-    timeit!({
-        iterate::<f64>(0.0f64, 0.0f64, max).unwrap_or(0);
-    });
-}
-
 fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     let mut v = Vec::<u32>::with_capacity(canvas_size.pixel_count() as usize);
     let mut pb = ProgressBar::new(canvas_size.pixel_count() as u64);
