@@ -83,7 +83,7 @@ fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
 
 fn main() {
     let c = CanvasSize {
-        pixel_width: 1280,
+        pixel_width: 1920,
         pixel_height: 1280,
         top: 1.0,
         bottom: -1.0,
