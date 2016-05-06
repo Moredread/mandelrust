@@ -97,16 +97,16 @@ fn main() {
 
     let n_colors = 256u32;
 
-    let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.1, 0.1)),
-                                  Hsv::from(Rgb::new(0.1, 1.0, 1.0))]);
+    let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.0, 0.0)),
+                                  Hsv::from(Rgb::new(0.0, 1.0, 1.0))]);
 
     for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
         let i = v[c.coord_to_idx(x, y)];
-        let c: [u8; 3] = match i == max {
+        let color: [u8; 3] = match i == max {
             true => [0, 0, 0],
             false => grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel(),
         };
-        *pixel = image::Rgb(c);
+        *pixel = image::Rgb(color);
     }
 
     let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
