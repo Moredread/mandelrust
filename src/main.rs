@@ -34,8 +34,8 @@ fn settings() -> WindowSettings {
 
 fn main() {
     let c = CanvasSize {
-        pixel_width: 800,
-        pixel_height: 600,
+        pixel_width: 80,
+        pixel_height: 60,
         top: 1.0,
         bottom: -1.0,
         left: -2.0,
@@ -43,13 +43,13 @@ fn main() {
     };
     let max = 256u32;
 
-    //let v = calculate_all(c, max);
-    //let imgbuf = make_image(v, c, max);
+    let v = calculate_all(c, max);
+    let imgbuf = make_image(v, c, max);
     //let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
 
     //let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
 
     let mut driver2d = Driver2d::new(settings());
-    let output = benzene::start(App::new(), driver2d.output());
+    let output = benzene::start(App::new(imgbuf), driver2d.output());
     driver2d.run(output);
 }
