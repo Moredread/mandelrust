@@ -81,6 +81,25 @@ fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     v
 }
 
+fn image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) -> image::RgbImage {
+    let mut imgbuf = image::RgbImage::new(canvas_size.pixel_width, canvas_size.pixel_height);
+
+    let n_colors = 256u32;
+
+    let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.0, 0.0)),
+                                  Hsv::from(Rgb::new(0.0, 1.0, 1.0))]);
+
+    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+        let i = data[canvas_size.coord_to_idx(x, y)];
+        let color: [u8; 3] = match i == max_iterations {
+            true => [0, 0, 0],
+            false => grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel(),
+        };
+        *pixel = image::Rgb(color);
+    }
+    imgbuf
+}
+
 fn main() {
     let c = CanvasSize {
         pixel_width: 1920,
@@ -93,22 +112,7 @@ fn main() {
     let max = 256u32;
 
     let v = calculate_all(c, max);
-    let mut imgbuf = image::ImageBuffer::new(c.pixel_width, c.pixel_height);
-
-    let n_colors = 256u32;
-
-    let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.0, 0.0)),
-                                  Hsv::from(Rgb::new(0.0, 1.0, 1.0))]);
-
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let i = v[c.coord_to_idx(x, y)];
-        let color: [u8; 3] = match i == max {
-            true => [0, 0, 0],
-            false => grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel(),
-        };
-        *pixel = image::Rgb(color);
-    }
-
+    let imgbuf = image(v, c, max);
     let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
 
     let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
