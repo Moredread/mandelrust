@@ -2,6 +2,7 @@
 name = "mandelrust"
 version = "0.1.0"
 authors = ["André-Patrick Bubel <code@andre-bubel.de>"]
+license = "GPL-3.0+"
 
 [dependencies]
 rust-mpfr = "*"
@@ -9,3 +10,4 @@ timeit = "*"
 image = "*"
 pbr = "*"
 palette = "*"
+carboxyl = "*"
