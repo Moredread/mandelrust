@@ -34,8 +34,8 @@ fn settings() -> WindowSettings {
 
 fn main() {
     let c = CanvasSize {
-        pixel_width: 80,
-        pixel_height: 60,
+        pixel_width: 800,
+        pixel_height: 600,
         top: 1.0,
         bottom: -1.0,
         left: -2.0,
