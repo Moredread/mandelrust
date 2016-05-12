@@ -68,7 +68,7 @@ pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
         let (x, y) = canvas_size.coordinates(p_x, p_y);
 
         v.push(iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations));
-        if i % canvas_size.pixel_height == 0 && i != 0 {
+        if i % canvas_size.pixel_height == 0 {
             pb.add(canvas_size.pixel_height as u64);
         };
     }
