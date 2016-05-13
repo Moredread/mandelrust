@@ -37,7 +37,6 @@ script:
   - travis-cargo --only nightly bench
   - travis-cargo --only stable doc
 
-after_success:
   - if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo; fi
   - type ccache >/dev/null 2>&1 && ccache -s
 
