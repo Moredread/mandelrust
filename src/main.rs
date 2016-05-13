@@ -29,7 +29,7 @@ use app::App;
 use benzene::Driver;
 
 fn settings() -> WindowSettings {
-    WindowSettings::new("Mandelrust", (800, 600))
+    WindowSettings::new("Mandelrust", (900, 600))
 }
 
 fn main() {
