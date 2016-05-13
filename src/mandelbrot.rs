@@ -1,9 +1,6 @@
 use palette::{Rgb, Hsv, Gradient, IntoColor};
-use std::fs::File;
-use std::path::Path;
 use pbr::ProgressBar;
 use std::ops::{Mul, Add, Neg, Sub};
-use driver::Driver2d;
 use image;
 
 #[derive(Copy, Clone)]

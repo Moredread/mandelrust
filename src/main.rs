@@ -38,9 +38,9 @@ fn main() {
 
     let v = calculate_all(c, max);
     let imgbuf = make_image(v, c, max);
-    //let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
+    let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
 
-    //let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
+    let _ = image::ImageRgb8(imgbuf.clone()).save(fout, image::PNG);
 
     let mut driver2d = Driver2d::new(settings());
     let output = benzene::start(App::new(imgbuf), driver2d.output());
