@@ -14,8 +14,8 @@ addons:
       - libcurl4-openssl-dev
       - libelf-dev
       - libdw-dev
-      - mpfr
-      - gmp
+      - libmpfr-dev
+      - libgmp-dev
 
 sudo: false
 
