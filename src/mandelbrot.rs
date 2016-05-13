@@ -10,13 +10,30 @@ use image;
 pub struct CanvasSize {
     pub pixel_width: u32,
     pub pixel_height: u32,
-    pub top: f64,
-    pub bottom: f64,
-    pub left: f64,
-    pub right: f64,
+    top: f64,
+    bottom: f64,
+    left: f64,
+    right: f64,
 }
 
 impl CanvasSize {
+    pub fn new(pixel_width: u32,
+               pixel_height: u32,
+               top: f64,
+               bottom: f64,
+               left: f64,
+               right: f64)
+               -> CanvasSize {
+        CanvasSize {
+            pixel_width: pixel_width,
+            pixel_height: pixel_height,
+            top: top,
+            bottom: bottom,
+            left: left,
+            right: right,
+        }
+    }
+
     fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
         let x_ = self.left + (self.right - self.left) * (x as f64) / (self.pixel_width as f64);
         let y_ = self.top + (self.bottom - self.top) * (y as f64) / (self.pixel_height as f64);
@@ -37,6 +54,22 @@ impl CanvasSize {
 
     fn pixel_count(&self) -> u32 {
         self.pixel_width * self.pixel_height
+    }
+
+    fn bottom(&self) -> f64 {
+        self.bottom
+    }
+
+    fn top(&self) -> f64 {
+        self.top
+    }
+
+    fn left(&self) -> f64 {
+        self.left
+    }
+
+    fn right(&self) -> f64 {
+        self.right
     }
 }
 
@@ -93,4 +126,19 @@ pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) 
         *pixel = image::Rgb(color);
     }
     imgbuf
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_canvas_size() {
+        let c = CanvasSize::new(800, 600, 1.0, -1.0, -2.0, 1.0);
+
+        assert_eq!(c.top(), 1.0);
+        assert_eq!(c.bottom(), -1.0);
+        assert_eq!(c.left(), -2.0);
+        assert_eq!(c.right(), 1.0);
+    }
 }
