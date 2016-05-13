@@ -34,9 +34,28 @@ impl CanvasSize {
         }
     }
 
+    pub fn new_from_center(pixel_width: u32,
+                           pixel_height: u32,
+                           center: [f64; 2],
+                           zoom: f64)
+                           -> CanvasSize {
+        let aspect = pixel_height as f64 / pixel_width as f64;
+        let width = 3.0 / zoom;
+        let height = width * aspect;
+
+        let top = center[1] + height / 2.0;
+        let bottom = center[1] - height / 2.0;
+        let right = center[0] + width / 2.0;
+        let left = center[0] - width / 2.0;
+
+        CanvasSize::new(pixel_width, pixel_height, top, bottom, left, right)
+    }
+
     fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
-        let x_ = self.left + (self.right - self.left) * (x as f64) / (self.pixel_width as f64);
-        let y_ = self.top + (self.bottom - self.top) * (y as f64) / (self.pixel_height as f64);
+        let x_ = self.left() +
+                 (self.right() - self.left()) * (x as f64) / (self.pixel_width as f64);
+        let y_ = self.top() +
+                 (self.bottom() - self.top()) * (y as f64) / (self.pixel_height as f64);
         return (x_, y_);
     }
 
@@ -134,11 +153,33 @@ mod tests {
 
     #[test]
     fn new_canvas_size() {
-        let c = CanvasSize::new(800, 600, 1.0, -1.0, -2.0, 1.0);
+        let c = CanvasSize::new(900, 600, 1.0, -1.0, -2.0, 1.0);
 
         assert_eq!(c.top(), 1.0);
         assert_eq!(c.bottom(), -1.0);
         assert_eq!(c.left(), -2.0);
         assert_eq!(c.right(), 1.0);
     }
+
+    #[test]
+    fn new_canvas_size_from_center() {
+        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+
+        assert_eq!(c.top(), 1.0);
+        assert_eq!(c.bottom(), -1.0);
+        assert_eq!(c.left(), -2.0);
+        assert_eq!(c.right(), 1.0);
+    }
+
+    #[test]
+    fn new_canvas_size_from_center_and_zoom() {
+        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 2.0);
+
+        assert_eq!(c.top(), 0.5);
+        assert_eq!(c.bottom(), -0.5);
+        assert_eq!(c.left(), -1.25);
+        assert_eq!(c.right(), 0.25);
+    }
+
+
 }

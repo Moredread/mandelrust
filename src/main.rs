@@ -33,7 +33,7 @@ fn settings() -> WindowSettings {
 }
 
 fn main() {
-    let c = CanvasSize::new(800, 600, 1.0, -1.0, -2.0, 1.0);
+    let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
     let max = 256u32;
 
     let v = calculate_all(c, max);
