@@ -23,6 +23,8 @@ cache:
   directories:
     - $HOME/.ccache
 
+cache: cargo
+
 before_script:
   - pip install 'travis-cargo<0.2' --user
   - export PATH=/usr/lib/ccache:$HOME/.local/bin:/Users/travis/Library/Python/2.7/bin:$PATH
