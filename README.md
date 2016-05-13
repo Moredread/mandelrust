@@ -1,6 +1,8 @@
 Mandelrust
 ==========
 
+[![Build Status](https://travis-ci.org/Moredread/mandelrust.svg?branch=master)](https://travis-ci.org/Moredread/mandelrust)
+
 License
 =======
 
