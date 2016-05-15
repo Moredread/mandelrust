@@ -61,11 +61,11 @@ impl CanvasSize {
     }
 
     pub fn zoom(&self, zoom: f64) -> CanvasSize {
-        CanvasSize::new_from_center(self.pixel_width, self.pixel_height, self.center(), zoom)
+        CanvasSize::new_from_center(self.pixel_width, self.pixel_height, self.center(), self.get_zoom() * zoom)
     }
 
     pub fn get_zoom(&self) -> f64 {
-        self.width() / 3.0
+        3.0 / self.width()
     }
 
     pub fn move_center(&self, new_center: [f64; 2]) -> CanvasSize {
@@ -232,6 +232,11 @@ mod tests {
         assert_eq!(zoomed.center(), center);
         assert_eq!(zoomed.height(), 1.0);
         assert_eq!(zoomed.width(), 1.5);
+
+        let zoomed_again = zoomed.zoom(2.0);
+        assert_eq!(zoomed_again.center(), center);
+        assert_eq!(zoomed_again.height(), 0.5);
+        assert_eq!(zoomed_again.width(), 0.75);
     }
 
     #[test]
