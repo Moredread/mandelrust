@@ -64,6 +64,14 @@ impl CanvasSize {
         CanvasSize::new_from_center(self.pixel_width, self.pixel_height, self.center(), zoom)
     }
 
+    pub fn get_zoom(&self) -> f64 {
+        self.width() / 3.0
+    }
+
+    pub fn move_center(&self, new_center: [f64; 2]) -> CanvasSize {
+        CanvasSize::new_from_center(self.pixel_width, self.pixel_height, new_center, self.get_zoom())
+    }
+
     fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
         let x_ = self.left() +
                  (self.right() - self.left()) * (x as f64) / (self.pixel_width as f64);
@@ -217,15 +225,20 @@ mod tests {
 
     #[test]
     fn test_to_zoom() {
-        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+        let center = [-0.5f64, 0.0];
+        let c = CanvasSize::new_from_center(900, 600, center, 1.0);
         let zoomed = c.zoom(2.0);
 
-        assert_eq!(zoomed.top(), 0.5);
-        assert_eq!(zoomed.bottom(), -0.5);
-        assert_eq!(zoomed.left(), -1.25);
-        assert_eq!(zoomed.right(), 0.25);
+        assert_eq!(zoomed.center(), center);
         assert_eq!(zoomed.height(), 1.0);
         assert_eq!(zoomed.width(), 1.5);
     }
 
+    #[test]
+    fn test_move_center() {
+        let new_center = [0.0f64, -1.0];
+        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+
+        assert_eq!(c.move_center(new_center).center(), new_center);
+    }
 }
