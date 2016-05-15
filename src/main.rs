@@ -23,7 +23,7 @@ mod app;
 use std::fs::File;
 use std::path::Path;
 use driver::Driver2d;
-use mandelbrot::{CanvasSize, calculate_all, make_image};
+use mandelbrot::{CanvasSize};
 use piston::window::WindowSettings;
 use benzene::{Driver, Component, interpret, start};
 
@@ -36,17 +36,11 @@ fn main() {
     let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
     let max = 256u32;
 
-    let v = calculate_all(c, max);
-    let imgbuf = make_image(v, c, max);
-    let ref mut fout = File::create(&Path::new("fractal.png")).unwrap();
-
-    let _ = image::ImageRgb8(imgbuf.clone()).save(fout, image::PNG);
-
     let mut driver2d = Driver2d::new(settings());
 
     let output = start(
         Component {
-            init: app::init(imgbuf),
+            init: app::init(c, max),
             update: app::update,
             view: app::view,
             effect: |_, _| None
