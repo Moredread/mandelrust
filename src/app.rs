@@ -1,17 +1,20 @@
 use carboxyl_window::{Context, Event};
 use carboxyl_window::Event::Press;
-use input::Button::Keyboard;
+use input::Button::Mouse;
 use input::Key;
 use image::RgbImage;
 use mandelbrot::*;
 
 #[derive(Clone)]
 pub struct Action {
-
+    zoom_location: [f64; 2],
 }
 
-pub fn intent(_: Context, event: Event) -> Option<Action> {
-    None
+pub fn intent(context: Context, event: Event) -> Option<Action> {
+    match event {
+        Press(Mouse(Left)) => { Some(Action { zoom_location: [context.cursor.position.0, context.cursor.position.1] }) },
+        _ => None
+    }
 }
 
 #[derive(Clone)]
@@ -41,7 +44,7 @@ pub fn init(canvas: CanvasSize, max: u32) -> State {
 }
 
 pub fn update(current: State, action: Action) -> State {
-    current
+    State::calc(current.canvas.zoom(1.5).move_center_to_pixel(action.zoom_location), current.max)
 }
 
 pub fn view(context: Context, state: State) -> View {

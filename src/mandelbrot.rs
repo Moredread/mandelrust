@@ -72,12 +72,18 @@ impl CanvasSize {
         CanvasSize::new_from_center(self.pixel_width, self.pixel_height, new_center, self.get_zoom())
     }
 
+    pub fn move_center_to_pixel(&self, coord: [f64; 2]) -> CanvasSize {
+        let new_center = self.coordinates(coord[0] as u32, coord[1] as u32);
+
+        self.move_center([new_center.0, new_center.1])
+    }
+
     fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
         let x_ = self.left() +
                  (self.right() - self.left()) * (x as f64) / (self.pixel_width as f64);
         let y_ = self.top() +
                  (self.bottom() - self.top()) * (y as f64) / (self.pixel_height as f64);
-        return (x_, y_);
+        (x_, y_)
     }
 
     fn coord_to_idx(&self, x: u32, y: u32) -> usize {
