@@ -25,8 +25,8 @@ use std::path::Path;
 use driver::Driver2d;
 use mandelbrot::{CanvasSize, calculate_all, make_image};
 use piston::window::WindowSettings;
-use app::App;
-use benzene::Driver;
+use benzene::{Driver, Component, interpret, start};
+
 
 fn settings() -> WindowSettings {
     WindowSettings::new("Mandelrust", (900, 600))
@@ -43,6 +43,16 @@ fn main() {
     let _ = image::ImageRgb8(imgbuf.clone()).save(fout, image::PNG);
 
     let mut driver2d = Driver2d::new(settings());
-    let output = benzene::start(App::new(imgbuf), driver2d.output());
+
+    let output = start(
+        Component {
+            init: app::init(imgbuf),
+            update: app::update,
+            view: app::view,
+            effect: |_, _| None
+        },
+        interpret(driver2d.output(), app::intent)
+    );
+
     driver2d.run(output);
 }
