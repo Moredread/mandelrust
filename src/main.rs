@@ -34,7 +34,7 @@ fn settings() -> WindowSettings {
 
 fn main() {
     let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
-    let max = 256u32;
+    let max = 25600u32;
 
     let mut driver2d = Driver2d::new(settings());
 
@@ -46,7 +46,7 @@ fn main() {
             effect: |_, _| None
         },
         interpret(driver2d.output(), app::intent)
-    );
+        );
 
     driver2d.run(output);
 }

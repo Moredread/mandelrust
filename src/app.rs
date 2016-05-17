@@ -1,19 +1,23 @@
 use carboxyl_window::{Context, Event};
 use carboxyl_window::Event::Press;
 use input::Button::Mouse;
-use input::Key;
+use input::{Key, MouseButton};
 use image::RgbImage;
 use mandelbrot::*;
 
-#[derive(Clone)]
-pub struct Action {
-    zoom_location: [f64; 2],
+#[derive(Clone, Copy)]
+pub enum Action {
+    ZoomIn([f64; 2]),
+    ZoomOut,
 }
 
 pub fn intent(context: Context, event: Event) -> Option<Action> {
     match event {
-        Press(Mouse(Left)) => { Some(Action { zoom_location: [context.cursor.position.0, context.cursor.position.1] }) },
-        _ => None
+        Press(Mouse(MouseButton::Left)) => {
+            Some(Action::ZoomIn([context.cursor.position.0, context.cursor.position.1]))
+        }
+        Press(Mouse(MouseButton::Right)) => Some(Action::ZoomOut),
+        _ => None,
     }
 }
 
@@ -21,13 +25,13 @@ pub fn intent(context: Context, event: Event) -> Option<Action> {
 pub struct State {
     image: RgbImage,
     canvas: CanvasSize,
-    max: u32
+    max: u32,
 }
 
 impl State {
     fn calc(canvas: CanvasSize, max: u32) -> State {
-       let v = calculate_all(canvas, max);
-       let imgbuf = make_image(v, canvas, max);
+        let v = calculate_all(canvas, max);
+        let imgbuf = make_image(v, canvas, max);
 
         State {
             image: imgbuf,
@@ -44,7 +48,13 @@ pub fn init(canvas: CanvasSize, max: u32) -> State {
 }
 
 pub fn update(current: State, action: Action) -> State {
-    State::calc(current.canvas.zoom(1.5).move_center_to_pixel(action.zoom_location), current.max)
+    match action {
+        Action::ZoomIn(l) => {
+            State::calc(current.canvas.move_center_to_pixel(l).zoom(8.0),
+                        current.max)
+        }
+        Action::ZoomOut => State::calc(current.canvas.zoom(1.0f64 / 8.0), current.max),
+    }
 }
 
 pub fn view(context: Context, state: State) -> View {
