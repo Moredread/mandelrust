@@ -7,6 +7,7 @@ license = "GPL-3.0+"
 [lib]
 name = "mandelrust"
 path = "src/lib.rs"
+doc = false
 
 [dependencies]
 rust-mpfr = "*"
