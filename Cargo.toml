@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["André-Patrick Bubel <code@andre-bubel.de>"]
 license = "GPL-3.0+"
 
+[lib]
+name = "mandelrust"
+path = "src/lib.rs"
+
 [dependencies]
 rust-mpfr = "*"
 timeit = "*"

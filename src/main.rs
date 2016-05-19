@@ -1,3 +1,4 @@
+extern crate mandelrust;
 extern crate graphics;
 extern crate glium;
 extern crate glium_graphics;
@@ -17,7 +18,7 @@ extern crate palette;
 extern crate input;
 
 mod driver;
-mod mandelbrot;
+pub mod mandelbrot;
 mod app;
 
 use driver::Driver2d;
