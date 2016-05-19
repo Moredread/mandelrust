@@ -20,8 +20,6 @@ mod driver;
 mod mandelbrot;
 mod app;
 
-use std::fs::File;
-use std::path::Path;
 use driver::Driver2d;
 use mandelbrot::{CanvasSize};
 use piston::window::WindowSettings;

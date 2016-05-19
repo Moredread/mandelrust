@@ -1,7 +1,7 @@
 use carboxyl_window::{Context, Event};
 use carboxyl_window::Event::Press;
 use input::Button::Mouse;
-use input::{Key, MouseButton};
+use input::MouseButton;
 use image::RgbImage;
 use mandelbrot::*;
 
@@ -57,7 +57,6 @@ pub fn update(current: State, action: Action) -> State {
     }
 }
 
-pub fn view(context: Context, state: State) -> View {
-    let (width, height) = context.window.size;
+pub fn view(_: Context, state: State) -> View {
     state.image
 }
