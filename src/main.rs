@@ -10,7 +10,6 @@ extern crate carboxyl;
 extern crate carboxyl_window;
 extern crate benzene;
 #[macro_use]
-extern crate timeit;
 extern crate rust_mpfr;
 extern crate pbr;
 extern crate image;
