@@ -12,7 +12,6 @@ doc = false
 [dependencies]
 rust-mpfr = "*"
 image = "0.6"
-pbr = "*"
 palette = "*"
 carboxyl = "0.2"
 carboxyl_window = "0.0.3"

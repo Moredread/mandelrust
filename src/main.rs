@@ -11,7 +11,6 @@ extern crate carboxyl_window;
 extern crate benzene;
 #[macro_use]
 extern crate rust_mpfr;
-extern crate pbr;
 extern crate image;
 extern crate palette;
 extern crate input;
