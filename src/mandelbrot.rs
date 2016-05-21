@@ -48,15 +48,15 @@ impl CanvasSize {
     }
 
     fn width(&self) -> f64 {
-        self.right() - self.left()
+        self.right - self.left
     }
 
     fn height(&self) -> f64 {
-        self.top() - self.bottom()
+        self.top - self.bottom
     }
 
     fn center(&self) -> [f64; 2] {
-        [self.left() + self.width() / 2.0, self.bottom + self.height() / 2.0]
+        [self.left + self.width() / 2.0, self.bottom + self.height() / 2.0]
     }
 
     pub fn zoom(&self, zoom: f64) -> CanvasSize {
@@ -78,10 +78,10 @@ impl CanvasSize {
     }
 
     fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
-        let x_ = self.left() +
-                 (self.right() - self.left()) * (x as f64) / (self.pixel_width as f64);
-        let y_ = self.top() +
-                 (self.bottom() - self.top()) * (y as f64) / (self.pixel_height as f64);
+        let x_ = self.left +
+                 (self.right - self.left) * (x as f64) / (self.pixel_width as f64);
+        let y_ = self.top +
+                 (self.bottom - self.top) * (y as f64) / (self.pixel_height as f64);
         (x_, y_)
     }
 
@@ -99,22 +99,6 @@ impl CanvasSize {
 
     fn pixel_count(&self) -> u32 {
         self.pixel_width * self.pixel_height
-    }
-
-    fn bottom(&self) -> f64 {
-        self.bottom
-    }
-
-    fn top(&self) -> f64 {
-        self.top
-    }
-
-    fn left(&self) -> f64 {
-        self.left
-    }
-
-    fn right(&self) -> f64 {
-        self.right
     }
 }
 
@@ -174,10 +158,10 @@ mod tests {
     fn new_canvas_size() {
         let c = CanvasSize::new(900, 600, 1.0, -1.0, -2.0, 1.0);
 
-        assert_eq!(c.top(), 1.0);
-        assert_eq!(c.bottom(), -1.0);
-        assert_eq!(c.left(), -2.0);
-        assert_eq!(c.right(), 1.0);
+        assert_eq!(c.top, 1.0);
+        assert_eq!(c.bottom, -1.0);
+        assert_eq!(c.left, -2.0);
+        assert_eq!(c.right, 1.0);
         assert_eq!(c.height(), 2.0);
         assert_eq!(c.width(), 3.0);
     }
@@ -186,10 +170,10 @@ mod tests {
     fn new_canvas_size_from_center() {
         let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
 
-        assert_eq!(c.top(), 1.0);
-        assert_eq!(c.bottom(), -1.0);
-        assert_eq!(c.left(), -2.0);
-        assert_eq!(c.right(), 1.0);
+        assert_eq!(c.top, 1.0);
+        assert_eq!(c.bottom, -1.0);
+        assert_eq!(c.left, -2.0);
+        assert_eq!(c.right, 1.0);
         assert_eq!(c.height(), 2.0);
         assert_eq!(c.width(), 3.0);
     }
@@ -198,10 +182,10 @@ mod tests {
     fn new_canvas_size_from_center_and_zoom() {
         let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 2.0);
 
-        assert_eq!(c.top(), 0.5);
-        assert_eq!(c.bottom(), -0.5);
-        assert_eq!(c.left(), -1.25);
-        assert_eq!(c.right(), 0.25);
+        assert_eq!(c.top, 0.5);
+        assert_eq!(c.bottom, -0.5);
+        assert_eq!(c.left, -1.25);
+        assert_eq!(c.right, 0.25);
         assert_eq!(c.height(), 1.0);
         assert_eq!(c.width(), 1.5);
     }
