@@ -26,6 +26,6 @@ fn bench_iterate_mpfr(b: &mut Bencher) {
 #[bench]
 fn bench_calculate_all(b: &mut Bencher) {
     let max = 1000;
-    let c = CanvasSize::new_from_center(200, 200, [-0.5, 0.0], 1.0);
+    let c = CanvasSize::new_from_center(20, 20, [-0.5, 0.0], 1.0);
     b.iter(|| calculate_all(c, max));
 }
