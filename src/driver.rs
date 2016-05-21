@@ -54,7 +54,7 @@ impl Driver<Communication<RgbImage, ()>> for Driver2d {
                 let transform = graphics::math::abs_transform(w as f64, h as f64);
                 let mut backend = GliumGraphics::new(&mut backend_sys, &mut target);
                 let texture = Texture::from_image(&mut glium_window,
-                                                  &(element.convert()),
+                                                  &element.convert(),
                                                   &TextureSettings::new())
                                   .unwrap();
                 clear(color::BLACK, &mut backend);
