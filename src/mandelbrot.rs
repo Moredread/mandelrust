@@ -118,15 +118,20 @@ impl CanvasSize {
     }
 }
 
-pub fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64> + Clone + PartialOrd>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
+pub fn iterate<T>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
+    where T: Add<Output=T> + for<'a> Add<&'a T, Output=T>
+           + Mul<Output=T> + for<'a> Mul<&'a T, Output=T>
+           + Neg + Sub<Output=T> + From<f64>
+           + Clone + PartialOrd,
+          for <'a> &'a T: Mul<Output=T>
 {
     let mut i = 0;
     let mut x = T::from(0.0f64);
     let mut y = T::from(0.0f64);
 
-    while x.clone() * x.clone() + y.clone() * y.clone() < T::from(4.0f64) && (i < max_iterations) {
-        let xtemp = x.clone() * x.clone() - y.clone() * y.clone() + x0.clone();
-        y = (T::from(2.0f64)) * x * y + y0.clone();
+    while &x * &x + &y * &y < T::from(4.0f64) && (i < max_iterations) {
+        let xtemp = &x * &x - &y * &y + &x0;
+        y = T::from(2.0f64) * &x * &y + &y0;
         x = xtemp;
         i += 1;
     }
