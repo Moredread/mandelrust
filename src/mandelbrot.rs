@@ -131,23 +131,16 @@ pub fn iterate<T: Add<Output=T> + Mul<Output=T> + Neg + Sub<Output=T> + From<f64
         i += 1;
     }
 
-    match i != max_iterations {
-        true => Some(i),
-        false => None,
-    }
+    if i != max_iterations { Some(i) } else { None }
 }
 
 pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
-    let mut v = Vec::<u32>::with_capacity(canvas_size.pixel_count() as usize);
-
-    for i in 0..canvas_size.pixel_count() {
+    (0..canvas_size.pixel_count()).map(|i| {
         let (p_x, p_y) = canvas_size.idx_to_coord(i as usize);
         let (x, y) = canvas_size.coordinates(p_x, p_y);
 
-        v.push(iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations));
-    }
-
-    v
+        iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations)
+    }).collect()
 }
 
 pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) -> image::RgbImage {
