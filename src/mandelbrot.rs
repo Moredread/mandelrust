@@ -149,23 +149,21 @@ pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
 }
 
 pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) -> image::RgbImage {
-    let mut imgbuf = image::RgbImage::new(canvas_size.pixel_width, canvas_size.pixel_height);
-
     let n_colors = 256u32;
-
     let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.0, 0.0)),
                                   Hsv::from(Rgb::new(0.0, 1.0, 1.0))]);
 
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let i = data[canvas_size.coord_to_idx(x, y)];
-        let color: [u8; 3] = if i == max_iterations {
-            [0, 0, 0]
-        } else {
-            grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel()
-        };
-        *pixel = image::Rgb(color);
-    }
-    imgbuf
+    image::RgbImage::from_fn(
+        canvas_size.pixel_width, canvas_size.pixel_height,
+        |x, y| {
+            let i = data[canvas_size.coord_to_idx(x, y)];
+            image::Rgb(if i == max_iterations {
+                [0, 0, 0]
+            } else {
+                grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel()
+            })
+        }
+    )
 }
 
 #[cfg(test)]
