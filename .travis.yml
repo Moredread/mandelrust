@@ -1,38 +1,51 @@
 language: rust
+
 rust:
-- nightly
-- beta
-- stable
+  - "nightly"
+  - "beta"
+  - "stable"
+
 os:
-- linux
+  - linux
+
 addons:
   apt:
     packages:
-    - libcurl4-openssl-dev
-    - libelf-dev
-    - binutils-dev
-    - libdw-dev
-    - libmpfr-dev
-    - libgmp-dev
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - binutils-dev # optional: only required for the --verify flag of coveralls
+      - libdw-dev
+      - libmpfr-dev
+      - libgmp-dev
+
 sudo: false
+
+cache:
+  directories:
+    - $HOME/.ccache
+
 cache: cargo
+
 before_script:
-- pip install 'travis-cargo<0.2' --user
-- export PATH=/usr/lib/ccache:$HOME/.local/bin:/Users/travis/Library/Python/2.7/bin:$PATH
+  - pip install 'travis-cargo<0.2' --user
+  - export PATH=/usr/lib/ccache:$HOME/.local/bin:/Users/travis/Library/Python/2.7/bin:$PATH
+
 script:
-- rustc --version
-- cargo --version
-- travis-cargo build
-- travis-cargo test
-- travis-cargo --only nightly bench
-- travis-cargo --only nightly doc
-- if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo --verify
-  --exclude-pattern="test/,target/debug/build/"; fi; true
-- if [ ${TRAVIS_OS_NAME} != "osx" ]; then type ccache >/dev/null 2>&1 && ccache -s;
-  fi; true
+  - rustc --version
+  - cargo --version
+  - travis-cargo build
+  - travis-cargo test
+  - travis-cargo --only nightly bench
+  - travis-cargo --only stable doc
+
+  - if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo --verify --exclude-pattern="test/,target/debug/build/"; fi; true
+  - if [ ${TRAVIS_OS_NAME} != "osx" ]; then type ccache >/dev/null 2>&1 && ccache -s; fi; true
+
 after_success:
   - travis-cargo --only nightly doc-upload
+
 env:
   global:
-  - TRAVIS_CARGO_NIGHTLY_FEATURE=""
-  - secure: XivijvX1ie5ztU+Bch69fMmk4htxGBfhq0Ywpgih0wRK5pkQndI6mb45mt39tL+IurxGx0OIsvI8GWPyKD4JJqfKBPzJ7mtOj7LqASoVayT//ctbvG8exKGVqjMr/1qBtUykUwJbqOeKke5UkaVKF5FxuQ/aEzpcfen6KrYZpfY9EjgxA6DBsrIeUWhmh7ztQD7MIMzXQXfX7rhoBT1jYygWjE8Mzac9T8xfY++75Uc/2jBUZwrowYIsyaeNO3VxuJPACBNWRXclbwtCcP1PWLV29ya7HcA0g3g5/NUy9bmRh/5/b6RHdgQMb31BV9weVtW5ncsUVvhHuFPCT8hxlAFb3cRY3wE0F222x9CiQyOfrmKvMyEcsIBuEGI4rApd8i6ck8r697PbSXaolAaJOQfQLBjemKsaWGuxP7ptsDJ1PNJ1i5I27MHdzyocA60Ge4xo12uuyvA55jl5YEa6y1Bs/l3xgIEmNrhadDW6Ek1ucC+9P9+qHZRCeZ4YIVNukNHN+KqJtrlwSUWmk+bFLLCokXB+oIAKHUf2neZ45KoI1X21R1pT8fd5PN+aqipfjp5S5t508J0/nX8mGIaoJfSG+hQqDZb8aPb5qPAgKGURinp3FCd/yq5oolOCq0/XesELymbE0DYzNBINw0PUz51KPo2CYkm3LkmVWAg2iew=
+    # override the default `--features unstable` used for the nightly branch
+    - TRAVIS_CARGO_NIGHTLY_FEATURE=""
+    - secure: XivijvX1ie5ztU+Bch69fMmk4htxGBfhq0Ywpgih0wRK5pkQndI6mb45mt39tL+IurxGx0OIsvI8GWPyKD4JJqfKBPzJ7mtOj7LqASoVayT//ctbvG8exKGVqjMr/1qBtUykUwJbqOeKke5UkaVKF5FxuQ/aEzpcfen6KrYZpfY9EjgxA6DBsrIeUWhmh7ztQD7MIMzXQXfX7rhoBT1jYygWjE8Mzac9T8xfY++75Uc/2jBUZwrowYIsyaeNO3VxuJPACBNWRXclbwtCcP1PWLV29ya7HcA0g3g5/NUy9bmRh/5/b6RHdgQMb31BV9weVtW5ncsUVvhHuFPCT8hxlAFb3cRY3wE0F222x9CiQyOfrmKvMyEcsIBuEGI4rApd8i6ck8r697PbSXaolAaJOQfQLBjemKsaWGuxP7ptsDJ1PNJ1i5I27MHdzyocA60Ge4xo12uuyvA55jl5YEa6y1Bs/l3xgIEmNrhadDW6Ek1ucC+9P9+qHZRCeZ4YIVNukNHN+KqJtrlwSUWmk+bFLLCokXB+oIAKHUf2neZ45KoI1X21R1pT8fd5PN+aqipfjp5S5t508J0/nX8mGIaoJfSG+hQqDZb8aPb5qPAgKGURinp3FCd/yq5oolOCq0/XesELymbE0DYzNBINw0PUz51KPo2CYkm3LkmVWAg2iew=
