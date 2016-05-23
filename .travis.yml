@@ -36,8 +36,7 @@ script:
   - travis-cargo build
   - travis-cargo test
   - travis-cargo --only nightly bench
-  - travis-cargo --only stable doc
-
+  - travis-cargo --only nightly doc
   - if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo --verify --exclude-pattern="test/,target/debug/build/"; fi; true
   - if [ ${TRAVIS_OS_NAME} != "osx" ]; then type ccache >/dev/null 2>&1 && ccache -s; fi; true
 
@@ -48,4 +47,6 @@ env:
   global:
     # override the default `--features unstable` used for the nightly branch
     - TRAVIS_CARGO_NIGHTLY_FEATURE=""
+    - secure: "GX1jE+cDYpTZ2Mhf7iX5yVjPHTKxBOrbY0s1Gx42dc0VCE/Jp9WosZiq078uPv8p2UF8NnQLTc7O33u/rlv09QvPGDgp6yud2nwLEPuwgi8mgXKcNCmAztTY5HmGyxvaTMZ+rRS+Irx9xwsKxYnXxRuhftHSNcC1hCWTN+m08N7iFEbWHlfSNF0KnXqb8jJHL6T/Xg2gqlzTwl889AQ0lX4H+OHqy7TLXzN6fEmjmglkMQiiID+PDsh8ufSJRlF33VBTXMgfco6OxfAnpmMey1cEPso3/Q0pHj8gHWjulflS0IFMsLOnugD/C2UkoW0PwyWT/fOI+NkCP5zCf0eIq/23waLeAq57dBMHSMTmZT3ySJA9hWzYdfWx+tDbagdbhLHvRTu4jeFfZyh8nPtyc23LHI3SPyaNlxkyMzsL3kJlb5sq/N5Wk8g0V0MXxXSNpC65ax6/HhoyBz5bAyhJNTnWjxbx4ooDKFvDK/L4towJHXOzJjYcwD3ErWvPxHMyBTgohr/Q0qP02ci5h6hMqQL57jMPIsRp+x+NnSk4EsFu1TtuzdSCIa52NGdWGGzSCLE9pNpYVQfwXG4WtGEJHFVXCg9HnFh2v/IuCHMkB9ag55PYNFuVvGNwUjec9dQOl6m3WkmWVQ9e4JMeOXP26E0riTAAW764NcHUDPk7spE="
+
     - secure: XivijvX1ie5ztU+Bch69fMmk4htxGBfhq0Ywpgih0wRK5pkQndI6mb45mt39tL+IurxGx0OIsvI8GWPyKD4JJqfKBPzJ7mtOj7LqASoVayT//ctbvG8exKGVqjMr/1qBtUykUwJbqOeKke5UkaVKF5FxuQ/aEzpcfen6KrYZpfY9EjgxA6DBsrIeUWhmh7ztQD7MIMzXQXfX7rhoBT1jYygWjE8Mzac9T8xfY++75Uc/2jBUZwrowYIsyaeNO3VxuJPACBNWRXclbwtCcP1PWLV29ya7HcA0g3g5/NUy9bmRh/5/b6RHdgQMb31BV9weVtW5ncsUVvhHuFPCT8hxlAFb3cRY3wE0F222x9CiQyOfrmKvMyEcsIBuEGI4rApd8i6ck8r697PbSXaolAaJOQfQLBjemKsaWGuxP7ptsDJ1PNJ1i5I27MHdzyocA60Ge4xo12uuyvA55jl5YEa6y1Bs/l3xgIEmNrhadDW6Ek1ucC+9P9+qHZRCeZ4YIVNukNHN+KqJtrlwSUWmk+bFLLCokXB+oIAKHUf2neZ45KoI1X21R1pT8fd5PN+aqipfjp5S5t508J0/nX8mGIaoJfSG+hQqDZb8aPb5qPAgKGURinp3FCd/yq5oolOCq0/XesELymbE0DYzNBINw0PUz51KPo2CYkm3LkmVWAg2iew=
