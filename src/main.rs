@@ -14,6 +14,7 @@ extern crate rust_mpfr;
 extern crate image;
 extern crate palette;
 extern crate input;
+extern crate rayon;
 
 mod driver;
 pub mod mandelbrot;
@@ -23,7 +24,6 @@ use driver::Driver2d;
 use mandelbrot::{CanvasSize};
 use piston::window::WindowSettings;
 use benzene::{Driver, Component, interpret, start};
-
 
 fn settings() -> WindowSettings {
     WindowSettings::new("Mandelrust", (900, 600))

@@ -1,5 +1,6 @@
 use palette::{Rgb, Hsv, Gradient, IntoColor};
 use std::ops::{Mul, Add, Neg, Sub};
+use rayon::prelude::*;
 use image;
 
 #[derive(Copy, Clone)]
@@ -124,12 +125,14 @@ pub fn iterate<T>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
 }
 
 pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
-    (0..canvas_size.pixel_count()).map(|i| {
+    let mut v: Vec<u32> = Vec::new();
+    (0..canvas_size.pixel_count()).into_par_iter().weight_max().map(|i| {
         let (p_x, p_y) = canvas_size.idx_to_coord(i as usize);
-        let (x, y) = canvas_size.coordinates(p_x, p_y);
-
+        canvas_size.coordinates(p_x, p_y)
+    }).map(|(x, y)| {
         iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations)
-    }).collect()
+    }).collect_into(&mut v);
+    v
 }
 
 pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) -> image::RgbImage {
