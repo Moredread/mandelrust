@@ -1,7 +1,7 @@
 use carboxyl_window::{Context, Event};
 use carboxyl_window::Event::Press;
-use input::Button::Mouse;
-use input::MouseButton;
+use input::Button::{Mouse, Keyboard};
+use input::{MouseButton, Key};
 use image::RgbImage;
 use mandelbrot::*;
 
@@ -9,6 +9,8 @@ use mandelbrot::*;
 pub enum Action {
     ZoomIn([f64; 2]),
     ZoomOut,
+    MaxIterationsUp,
+    MaxIterationsDown
 }
 
 pub fn intent(context: Context, event: Event) -> Option<Action> {
@@ -17,6 +19,8 @@ pub fn intent(context: Context, event: Event) -> Option<Action> {
             Some(Action::ZoomIn([context.cursor.position.0, context.cursor.position.1]))
         }
         Press(Mouse(MouseButton::Right)) => Some(Action::ZoomOut),
+        Press(Keyboard(Key::PageUp)) => Some(Action::MaxIterationsUp),
+        Press(Keyboard(Key::PageDown)) => Some(Action::MaxIterationsDown),
         _ => None,
     }
 }
@@ -54,6 +58,16 @@ pub fn update(current: State, action: Action) -> State {
                         current.max)
         }
         Action::ZoomOut => State::calc(current.canvas.zoom(1.0f64 / 8.0), current.max),
+        Action::MaxIterationsUp => {
+            println!("Max. iterations: {}", current.max + 1000);
+            State::calc(current.canvas, current.max + 1000)
+        },
+        Action::MaxIterationsDown => {
+            if current.max > 1000 {
+                println!("Max. iterations: {}", current.max - 1000);
+                State::calc(current.canvas, current.max - 1000)
+            } else { current }
+        }
     }
 }
 
