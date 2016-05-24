@@ -36,12 +36,12 @@ script:
   - travis-cargo build
   - travis-cargo test
   - travis-cargo --only nightly bench
-  - travis-cargo --only nightly doc
+  - travis-cargo --only stable doc
   - if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo --verify --exclude-pattern="test/,target/debug/build/"; fi; true
   - if [ ${TRAVIS_OS_NAME} != "osx" ]; then type ccache >/dev/null 2>&1 && ccache -s; fi; true
 
 after_success:
-  - travis-cargo --only nightly doc-upload
+  - travis-cargo --only stable doc-upload
 
 env:
   global:
