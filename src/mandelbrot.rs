@@ -73,29 +73,29 @@ impl CanvasSize {
     }
 
     pub fn move_center_to_pixel(&self, coord: [f64; 2]) -> CanvasSize {
-        let new_center = self.coordinates(coord[0] as u32, coord[1] as u32);
+        let new_center = self.coordinates([coord[0] as u32, coord[1] as u32]);
 
-        self.move_center([new_center.0, new_center.1])
+        self.move_center(new_center)
     }
 
-    fn coordinates(&self, x: u32, y: u32) -> (f64, f64) {
+    fn coordinates(&self, pixel_coordinates: [u32; 2]) -> [f64; 2] {
         let x_ = self.left +
-                 (self.right - self.left) * (x as f64) / (self.pixel_width as f64);
+                 (self.right - self.left) * (pixel_coordinates[0] as f64) / (self.pixel_width as f64);
         let y_ = self.top +
-                 (self.bottom - self.top) * (y as f64) / (self.pixel_height as f64);
-        (x_, y_)
+                 (self.bottom - self.top) * (pixel_coordinates[1] as f64) / (self.pixel_height as f64);
+        [x_, y_]
     }
 
-    fn coord_to_idx(&self, x: u32, y: u32) -> usize {
-        assert!(x < self.pixel_width);
-        assert!(y < self.pixel_height);
-        (self.pixel_width * y + x) as usize
+    fn coord_to_idx(&self, c: [u32; 2]) -> usize {
+        assert!(c[0] < self.pixel_width);
+        assert!(c[1] < self.pixel_height);
+        (self.pixel_width * c[1] + c[0]) as usize
     }
 
-    fn idx_to_coord(&self, idx: usize) -> (u32, u32) {
+    fn idx_to_coord(&self, idx: usize) -> [u32; 2] {
         let y = (idx as u32) / self.pixel_width;
         let x = (idx as u32) - y * self.pixel_width;
-        (x, y)
+        [x, y]
     }
 
     fn pixel_count(&self) -> u32 {
@@ -127,10 +127,9 @@ pub fn iterate<T>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
 pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     let mut v: Vec<u32> = Vec::new();
     (0..canvas_size.pixel_count()).into_par_iter().weight_max().map(|i| {
-        let (p_x, p_y) = canvas_size.idx_to_coord(i as usize);
-        canvas_size.coordinates(p_x, p_y)
-    }).map(|(x, y)| {
-        iterate::<f64>(x, y, max_iterations).unwrap_or(max_iterations)
+        canvas_size.coordinates(canvas_size.idx_to_coord(i as usize))
+    }).map(|c| {
+        iterate::<f64>(c[0], c[1], max_iterations).unwrap_or(max_iterations)
     }).collect_into(&mut v);
     v
 }
@@ -143,7 +142,7 @@ pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) 
     image::RgbImage::from_fn(
         canvas_size.pixel_width, canvas_size.pixel_height,
         |x, y| {
-            let i = data[canvas_size.coord_to_idx(x, y)];
+            let i = data[canvas_size.coord_to_idx([x, y])];
             image::Rgb(if i == max_iterations {
                 [0, 0, 0]
             } else {
