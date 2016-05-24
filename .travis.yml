@@ -20,10 +20,6 @@ addons:
 
 sudo: false
 
-cache:
-  directories:
-    - $HOME/.ccache
-
 cache: cargo
 
 before_script:
@@ -36,12 +32,11 @@ script:
   - travis-cargo build
   - travis-cargo test
   - travis-cargo --only nightly bench
-  - travis-cargo --only stable doc
-  - if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo --verify --exclude-pattern="test/,target/debug/build/"; fi; true
-  - if [ ${TRAVIS_OS_NAME} != "osx" ]; then type ccache >/dev/null 2>&1 && ccache -s; fi; true
+  - travis-cargo doc
 
 after_success:
   - travis-cargo --only stable doc-upload
+  - if [ ${TRAVIS_OS_NAME} != "osx" ]; then travis-cargo coveralls --no-sudo --verify --exclude-pattern="test/,target/debug/build/"; fi; true
 
 env:
   global:
