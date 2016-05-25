@@ -230,4 +230,11 @@ mod tests {
 
         assert_eq!(c.move_center(new_center).center(), new_center);
     }
+
+    #[test]
+    fn test_pixel_count() {
+        let c = CanvasSize::new_from_center(2, 3, [-0.5, 0.0], 1.0);
+
+        assert_eq!(c.pixel_count(), 6);
+    }
 }
