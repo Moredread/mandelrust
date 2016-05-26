@@ -1,25 +1,26 @@
 use palette::{Rgb, Hsv, Gradient, IntoColor};
 use std::ops::{Mul, Add, Neg, Sub};
 use rayon::prelude::*;
+use rust_mpfr::mpfr::*;
 use image;
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 pub struct CanvasSize {
     pub pixel_width: u32,
     pub pixel_height: u32,
-    top: f64,
-    bottom: f64,
-    left: f64,
-    right: f64,
+    top: Mpfr,
+    bottom: Mpfr,
+    left: Mpfr,
+    right: Mpfr,
 }
 
 impl CanvasSize {
     pub fn new(pixel_width: u32,
                pixel_height: u32,
-               top: f64,
-               bottom: f64,
-               left: f64,
-               right: f64)
+               top: Mpfr,
+               bottom: Mpfr,
+               left: Mpfr,
+               right: Mpfr)
                -> CanvasSize {
         CanvasSize {
             pixel_width: pixel_width,
@@ -33,42 +34,42 @@ impl CanvasSize {
 
     pub fn new_from_center(pixel_width: u32,
                            pixel_height: u32,
-                           center: [f64; 2],
-                           zoom: f64)
+                           center: [Mpfr; 2],
+                           zoom: Mpfr)
                            -> CanvasSize {
         let aspect = pixel_height as f64 / pixel_width as f64;
         let width = 3.0 / zoom;
-        let height = width * aspect;
+        let height = &width * aspect;
 
-        let top = center[1] + height / 2.0;
-        let bottom = center[1] - height / 2.0;
-        let right = center[0] + width / 2.0;
-        let left = center[0] - width / 2.0;
+        let top = &center[1] + &height / 2.0;
+        let bottom = &center[1] - &height / 2.0;
+        let right = &center[0] + &width / 2.0;
+        let left = &center[0] - &width / 2.0;
 
         CanvasSize::new(pixel_width, pixel_height, top, bottom, left, right)
     }
 
-    fn width(&self) -> f64 {
-        self.right - self.left
+    fn width(&self) -> Mpfr {
+        &self.right - &self.left
     }
 
-    fn height(&self) -> f64 {
-        self.top - self.bottom
+    fn height(&self) -> Mpfr {
+        &self.top - &self.bottom
     }
 
-    fn center(&self) -> [f64; 2] {
-        [self.left + self.width() / 2.0, self.bottom + self.height() / 2.0]
+    fn center(&self) -> [Mpfr; 2] {
+        [&self.left + self.width() / 2.0, &self.bottom + self.height() / 2.0]
     }
 
-    pub fn zoom(&self, zoom: f64) -> CanvasSize {
+    pub fn zoom(&self, zoom: Mpfr) -> CanvasSize {
         CanvasSize::new_from_center(self.pixel_width, self.pixel_height, self.center(), self.get_zoom() * zoom)
     }
 
-    pub fn get_zoom(&self) -> f64 {
+    pub fn get_zoom(&self) -> Mpfr {
         3.0 / self.width()
     }
 
-    pub fn move_center(&self, new_center: [f64; 2]) -> CanvasSize {
+    pub fn move_center(&self, new_center: [Mpfr; 2]) -> CanvasSize {
         CanvasSize::new_from_center(self.pixel_width, self.pixel_height, new_center, self.get_zoom())
     }
 
@@ -78,11 +79,11 @@ impl CanvasSize {
         self.move_center(new_center)
     }
 
-    fn coordinates(&self, pixel_coordinates: [u32; 2]) -> [f64; 2] {
-        let x_ = self.left +
-                 (self.right - self.left) * (pixel_coordinates[0] as f64) / (self.pixel_width as f64);
-        let y_ = self.top +
-                 (self.bottom - self.top) * (pixel_coordinates[1] as f64) / (self.pixel_height as f64);
+    fn coordinates(&self, pixel_coordinates: [u32; 2]) -> [Mpfr; 2] {
+        let x_ = &self.left +
+                 (&self.right - &self.left) * (pixel_coordinates[0] as f64 / self.pixel_width as f64);
+        let y_ = &self.top +
+                 (&self.bottom - &self.top) * (pixel_coordinates[1] as f64 / self.pixel_height as f64);
         [x_, y_]
     }
 
@@ -129,7 +130,7 @@ pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     (0..canvas_size.pixel_count()).into_par_iter().weight_max().map(|i| {
         canvas_size.coordinates(canvas_size.idx_to_coord(i as usize))
     }).map(|c| {
-        iterate::<f64>(c[0], c[1], max_iterations).unwrap_or(max_iterations)
+        iterate::<f64>((&c[0]).into(), (&c[1]).into(), max_iterations).unwrap_or(max_iterations)
     }).collect_into(&mut v);
     v
 }
@@ -158,82 +159,80 @@ mod tests {
 
     #[test]
     fn new_canvas_size() {
-        let c = CanvasSize::new(900, 600, 1.0, -1.0, -2.0, 1.0);
+        let c = CanvasSize::new(900, 600, mpfr!(1.0), mpfr!(-1.0), mpfr!(-2.0), mpfr!(1.0));
 
-        assert_eq!(c.top, 1.0);
-        assert_eq!(c.bottom, -1.0);
-        assert_eq!(c.left, -2.0);
-        assert_eq!(c.right, 1.0);
-        assert_eq!(c.height(), 2.0);
-        assert_eq!(c.width(), 3.0);
+        assert_eq!(c.top, mpfr!(1.0));
+        assert_eq!(c.bottom, mpfr!(-1.0));
+        assert_eq!(c.left, mpfr!(-2.0));
+        assert_eq!(c.right, mpfr!(1.0));
+        assert_eq!(c.height(), mpfr!(2.0));
+        assert_eq!(c.width(), mpfr!(3.0));
     }
 
     #[test]
     fn new_canvas_size_from_center() {
-        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+        let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
-        assert_eq!(c.top, 1.0);
-        assert_eq!(c.bottom, -1.0);
-        assert_eq!(c.left, -2.0);
-        assert_eq!(c.right, 1.0);
-        assert_eq!(c.height(), 2.0);
-        assert_eq!(c.width(), 3.0);
+        assert_eq!(c.top, mpfr!(1.0));
+        assert_eq!(c.bottom, mpfr!(-1.0));
+        assert_eq!(c.left, mpfr!(-2.0));
+        assert_eq!(c.right, mpfr!(1.0));
+        assert_eq!(c.height(), mpfr!(2.0));
+        assert_eq!(c.width(), mpfr!(3.0));
     }
 
     #[test]
     fn new_canvas_size_from_center_and_zoom() {
-        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 2.0);
+        let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(2.0));
 
-        assert_eq!(c.top, 0.5);
-        assert_eq!(c.bottom, -0.5);
-        assert_eq!(c.left, -1.25);
-        assert_eq!(c.right, 0.25);
-        assert_eq!(c.height(), 1.0);
-        assert_eq!(c.width(), 1.5);
+        assert_eq!(c.top, mpfr!(0.5));
+        assert_eq!(c.bottom, mpfr!(-0.5));
+        assert_eq!(c.left, mpfr!(-1.25));
+        assert_eq!(c.right, mpfr!(0.25));
+        assert_eq!(c.height(), mpfr!(1.0));
+        assert_eq!(c.width(), mpfr!(1.5));
     }
 
     #[test]
     fn test_center() {
-        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+        let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
-        assert_eq!(c.center(), [-0.5f64, 0.0]);
+        assert_eq!(c.center(), [mpfr!(-0.5), mpfr!(0.0)]);
     }
 
     #[test]
     fn test_width_and_height() {
-        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+        let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
-        assert_eq!(c.width(), 3.0);
-        assert_eq!(c.height(), 2.0);
+        assert_eq!(c.width(), mpfr!(3.0));
+        assert_eq!(c.height(), mpfr!(2.0));
     }
 
     #[test]
     fn test_to_zoom() {
-        let center = [-0.5f64, 0.0];
-        let c = CanvasSize::new_from_center(900, 600, center, 1.0);
-        let zoomed = c.zoom(2.0);
+        let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
+        let zoomed = c.zoom(mpfr!(2.0));
 
-        assert_eq!(zoomed.center(), center);
-        assert_eq!(zoomed.height(), 1.0);
-        assert_eq!(zoomed.width(), 1.5);
+        assert_eq!(zoomed.center(), [mpfr!(-0.5), mpfr!(0.0)]);
+        assert_eq!(zoomed.height(), mpfr!(1.0));
+        assert_eq!(zoomed.width(), mpfr!(1.5));
 
-        let zoomed_again = zoomed.zoom(2.0);
-        assert_eq!(zoomed_again.center(), center);
-        assert_eq!(zoomed_again.height(), 0.5);
-        assert_eq!(zoomed_again.width(), 0.75);
+        let zoomed_again = zoomed.zoom(mpfr!(2.0));
+        assert_eq!(zoomed_again.center(), [mpfr!(-0.5), mpfr!(0.0)]);
+        assert_eq!(zoomed_again.height(),mpfr!(0.5));
+        assert_eq!(zoomed_again.width(), mpfr!(0.75));
     }
 
     #[test]
     fn test_move_center() {
-        let new_center = [0.0f64, -1.0];
-        let c = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+        let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
-        assert_eq!(c.move_center(new_center).center(), new_center);
+        assert_eq!(c.move_center([mpfr!(0.0), mpfr!(-1.0)]).center(), [mpfr!(0.0), mpfr!(-1.0)]);
     }
 
     #[test]
     fn test_pixel_count() {
-        let c = CanvasSize::new_from_center(2, 3, [-0.5, 0.0], 1.0);
+        let c = CanvasSize::new_from_center(2, 3, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
         assert_eq!(c.pixel_count(), 6);
     }

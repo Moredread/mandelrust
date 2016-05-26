@@ -34,12 +34,12 @@ pub struct State {
 
 impl State {
     fn calc(canvas: CanvasSize, max: u32) -> State {
-        let v = calculate_all(canvas, max);
-        let imgbuf = make_image(v, canvas, max);
+        let v = calculate_all(canvas.clone(), max);
+        let imgbuf = make_image(v, canvas.clone(), max);
 
         State {
             image: imgbuf,
-            canvas: canvas,
+            canvas: canvas.clone(),
             max: max,
         }
     }
@@ -54,10 +54,10 @@ pub fn init(canvas: CanvasSize, max: u32) -> State {
 pub fn update(current: State, action: Action) -> State {
     match action {
         Action::ZoomIn(l) => {
-            State::calc(current.canvas.move_center_to_pixel(l).zoom(8.0),
+            State::calc(current.canvas.move_center_to_pixel(l).zoom(mpfr!(8.0)),
                         current.max)
         }
-        Action::ZoomOut => State::calc(current.canvas.zoom(1.0f64 / 8.0), current.max),
+        Action::ZoomOut => State::calc(current.canvas.zoom(mpfr!(1.0) / 8.0), current.max),
         Action::MaxIterationsUp => {
             println!("Max. iterations: {}", current.max + 1000);
             State::calc(current.canvas, current.max + 1000)

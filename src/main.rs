@@ -30,7 +30,7 @@ fn settings() -> WindowSettings {
 }
 
 fn main() {
-    let canvas = CanvasSize::new_from_center(900, 600, [-0.5, 0.0], 1.0);
+    let canvas = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
     let max = 1000u32;
 
     let mut driver2d = Driver2d::new(settings());
