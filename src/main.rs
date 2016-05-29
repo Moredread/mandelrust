@@ -15,6 +15,7 @@ extern crate image;
 extern crate palette;
 extern crate input;
 extern crate rayon;
+extern crate num;
 
 mod driver;
 pub mod mandelbrot;
@@ -30,7 +31,10 @@ fn settings() -> WindowSettings {
 }
 
 fn main() {
-    let canvas = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
+    let x = mpfr!(-0.5);
+    let y = mpfr!(0.0);
+    let zoom = mpfr!(1.0);
+    let canvas = CanvasSize::new_from_center(900, 600, [x, y], zoom);
     let max = 1000u32;
 
     let mut driver2d = Driver2d::new(settings());

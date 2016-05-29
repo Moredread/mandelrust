@@ -2,9 +2,9 @@
 #![feature(test)]
 
 extern crate test;
-extern crate mandelrust;
 #[macro_use]
 extern crate rust_mpfr;
+extern crate mandelrust;
 
 use test::Bencher;
 use mandelrust::mandelbrot::*;

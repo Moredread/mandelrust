@@ -10,7 +10,7 @@ path = "src/lib.rs"
 doc = false
 
 [dependencies]
-rust-mpfr = "*"
+rust-mpfr = { git = "https://github.com/Moredread/rust-mpfr" }
 image = "0.6"
 palette = "*"
 carboxyl = "0.2"
@@ -25,3 +25,4 @@ glium = "0.13"
 piston = "0.17"
 pistoncore-input = "0.8"
 rayon = "*"
+num = "0.1"
