@@ -3,7 +3,7 @@ Mandelrust
 
 [![Build Status](https://travis-ci.org/Moredread/mandelrust.svg?branch=master)](https://travis-ci.org/Moredread/mandelrust)
 
-[The docs][docs]
+[Online documentation][docs]
 
 [docs]: https://moredread.github.io/mandelrust/
 
