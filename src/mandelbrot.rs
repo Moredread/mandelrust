@@ -142,21 +142,21 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
 }
 
 
-pub fn iterate_delta(d: Complex64, X_n: Complex64, max_iterations: u32) -> Option<u32> {
+pub fn iterate_delta(d: Complex64, x_n: Complex64, max_iterations: u32) -> Option<u32> {
     None
 }
 
-pub fn delta(d: Complex64, X_n: Complex64, input: [Complex64; 4]) -> (Complex64, [Complex64; 3]) {
-    let A_n = input[0];
-    let B_n = input[1];
-    let C_n = input[2];
+pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64, [Complex64; 3]) {
+    let a_n = input[0];
+    let b_n = input[1];
+    let c_n = input[2];
 
-    let A_n1 = 2f64 * A_n * X_n + 1f64;
-    let B_n1 = 2f64 * B_n * X_n + A_n * A_n;
-    let C_n1 = 2f64 * C_n * X_n + A_n * B_n;
-    let X_n1 = A_n1 * d + B_n1 * d * d + C_n1 * d * d * d;
+    let a_n1 = 2f64 * a_n * x_n + 1f64;
+    let b_n1 = 2f64 * b_n * x_n + a_n * a_n;
+    let c_n1 = 2f64 * c_n * x_n + a_n * b_n;
+    let x_n1 = a_n1 * d + b_n1 * d * d + c_n1 * d * d * d;
 
-    return (X_n, [A_n1, B_n1, C_n1]);
+    return (x_n1, [a_n1, b_n1, c_n1]);
 }
 
 pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
