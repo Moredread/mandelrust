@@ -34,6 +34,24 @@ impl CanvasSize {
         }
     }
 
+    pub fn get_prec(&self) -> usize {
+        self.top.get_prec()
+    }
+
+    pub fn set_prec(&self, prec: usize) -> CanvasSize {
+        let mut new_top = Mpfr::new2(prec);
+        let mut new_bottom = Mpfr::new2(prec);
+        let mut new_left = Mpfr::new2(prec);
+        let mut new_right = Mpfr::new2(prec);
+
+        new_top.set(&self.top);
+        new_bottom.set(&self.bottom);
+        new_left.set(&self.left);
+        new_right.set(&self.right);
+
+        CanvasSize::new(self.pixel_width, self.pixel_height, new_top, new_bottom, new_left, new_right)
+    }
+
     pub fn new_from_center(pixel_width: u32,
                            pixel_height: u32,
                            center: [Mpfr; 2],
@@ -59,7 +77,7 @@ impl CanvasSize {
         &self.top - &self.bottom
     }
 
-    fn center(&self) -> [Mpfr; 2] {
+    pub fn center(&self) -> [Mpfr; 2] {
         [&self.left + self.width() / 2.0, &self.bottom + self.height() / 2.0]
     }
 
@@ -81,7 +99,7 @@ impl CanvasSize {
         self.move_center(new_center)
     }
 
-    fn coordinates(&self, pixel_coordinates: [u32; 2]) -> [Mpfr; 2] {
+    pub fn coordinates(&self, pixel_coordinates: [u32; 2]) -> [Mpfr; 2] {
         let x_ = &self.left +
                  (&self.right - &self.left) * (pixel_coordinates[0] as f64 / self.pixel_width as f64);
         let y_ = &self.top +
@@ -172,7 +190,7 @@ pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
 pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) -> image::RgbImage {
     let n_colors = 256u32;
     let grad = Gradient::new(vec![Hsv::from(Rgb::new(1.0, 0.0, 0.0)),
-                                  Hsv::from(Rgb::new(0.0, 1.0, 1.0))]);
+                                  Hsv::from(Rgb::new(0.0, 0.0, 1.0))]);
 
     image::RgbImage::from_fn(
         canvas_size.pixel_width, canvas_size.pixel_height,
@@ -190,6 +208,7 @@ pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rust_mpfr::mpfr::*;
 
     #[test]
     fn new_canvas_size() {
@@ -269,5 +288,27 @@ mod tests {
         let c = CanvasSize::new_from_center(2, 3, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
         assert_eq!(c.pixel_count(), 6);
+    }
+
+    #[test]
+    fn test_iterate_all() {
+        let c = CanvasSize::new_from_center(2, 3, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
+        let x = c.center()[0].clone();
+        let y = c.center()[1].clone();
+        let v = iterate_all::<Mpfr>(x, y, 10);
+
+        assert_eq!(v.len(), 10);
+    }
+
+    #[test]
+    fn test_iterate_all_prec() {
+        let prec = 128;
+        let c = CanvasSize::new_from_center(2, 3, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0)).set_prec(prec);
+        let x = c.center()[0].clone();
+        let y = c.center()[1].clone();
+        let v = iterate_all::<Mpfr>(x, y, 10);
+
+        assert_eq!(v[9].0.get_prec(), prec);
+        assert_eq!(v[9].1.get_prec(), prec);
     }
 }
