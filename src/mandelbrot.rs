@@ -2,6 +2,7 @@ use palette::{Rgb, Hsv, Gradient, IntoColor, RgbHue};
 use std::ops::{Mul, Add, Neg, Sub};
 use rayon::prelude::*;
 use rust_mpfr::mpfr::*;
+use std::cmp;
 use image;
 use num::complex::Complex64;
 use std::fmt::Display;
@@ -49,7 +50,12 @@ impl CanvasSize {
         new_left.set(&self.left);
         new_right.set(&self.right);
 
-        CanvasSize::new(self.pixel_width, self.pixel_height, new_top, new_bottom, new_left, new_right)
+        CanvasSize::new(self.pixel_width,
+                        self.pixel_height,
+                        new_top,
+                        new_bottom,
+                        new_left,
+                        new_right)
     }
 
     pub fn new_from_center(pixel_width: u32,
@@ -82,7 +88,10 @@ impl CanvasSize {
     }
 
     pub fn zoom(&self, zoom: Mpfr) -> CanvasSize {
-        CanvasSize::new_from_center(self.pixel_width, self.pixel_height, self.center(), self.get_zoom() * zoom)
+        CanvasSize::new_from_center(self.pixel_width,
+                                    self.pixel_height,
+                                    self.center(),
+                                    self.get_zoom() * zoom)
     }
 
     pub fn get_zoom(&self) -> Mpfr {
@@ -90,7 +99,10 @@ impl CanvasSize {
     }
 
     pub fn move_center(&self, new_center: [Mpfr; 2]) -> CanvasSize {
-        CanvasSize::new_from_center(self.pixel_width, self.pixel_height, new_center, self.get_zoom())
+        CanvasSize::new_from_center(self.pixel_width,
+                                    self.pixel_height,
+                                    new_center,
+                                    self.get_zoom())
     }
 
     pub fn move_center_to_pixel(&self, coord: [f64; 2]) -> CanvasSize {
@@ -101,9 +113,11 @@ impl CanvasSize {
 
     pub fn coordinates(&self, pixel_coordinates: [u32; 2]) -> [Mpfr; 2] {
         let x_ = &self.left +
-                 (&self.right - &self.left) * (pixel_coordinates[0] as f64 / self.pixel_width as f64);
+                 (&self.right - &self.left) *
+                 (pixel_coordinates[0] as f64 / self.pixel_width as f64);
         let y_ = &self.top +
-                 (&self.bottom - &self.top) * (pixel_coordinates[1] as f64 / self.pixel_height as f64);
+                 (&self.bottom - &self.top) *
+                 (pixel_coordinates[1] as f64 / self.pixel_height as f64);
         [x_, y_]
     }
 
@@ -133,7 +147,11 @@ pub fn iterate<T>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
 {
     let i = iterate_all::<T>(x0, y0, max_iterations).len() as u32;
 
-    if i != max_iterations { Some(i) } else { None }
+    if i != max_iterations {
+        Some(i)
+    } else {
+        None
+    }
 }
 
 pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
@@ -148,7 +166,7 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
     let mut y = T::from(0.0f64);
     let mut v = Vec::new();
 
-    while &x * &x + &y * &y < T::from(4.0f64) && (i < max_iterations) {
+    while &x * &x + &y * &y < T::from(4.0f64) && i < max_iterations {
         let xtemp = &x * &x - &y * &y + &x0;
         y = T::from(2.0f64) * &x * &y + &y0;
         x = xtemp;
@@ -158,7 +176,6 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
 
     v
 }
-
 
 pub fn iterate_delta(d: Complex64, x_n: Complex64, max_iterations: u32) -> Option<u32> {
     None
@@ -179,11 +196,15 @@ pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64,
 
 pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     let mut v: Vec<u32> = Vec::new();
-    (0..canvas_size.pixel_count()).into_par_iter().weight_max().map(|i| {
-        canvas_size.coordinates(canvas_size.idx_to_coord(i as usize))
-    }).map(|c| {
-        iterate::<Mpfr>((c[0].clone()), (c[1].clone()), max_iterations).unwrap_or(max_iterations)
-    }).collect_into(&mut v);
+    (0..canvas_size.pixel_count())
+        .into_par_iter()
+        .weight_max()
+        .map(|i| canvas_size.coordinates(canvas_size.idx_to_coord(i as usize)))
+        .map(|c| {
+            iterate::<Mpfr>((c[0].clone()), (c[1].clone()), max_iterations)
+                .unwrap_or(max_iterations)
+        })
+        .collect_into(&mut v);
     v
 }
 
@@ -192,17 +213,14 @@ pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) 
     let grad = Gradient::new(vec![Hsv::new(RgbHue::from(0f32), 1.0, 1.0),
                                   Hsv::new(RgbHue::from(360f32), 0.0, 1.0)]);
 
-    image::RgbImage::from_fn(
-        canvas_size.pixel_width, canvas_size.pixel_height,
-        |x, y| {
-            let i = data[canvas_size.coord_to_idx([x, y])];
-            image::Rgb(if i == max_iterations {
-                [0, 0, 0]
-            } else {
-                grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel()
-            })
-        }
-    )
+    image::RgbImage::from_fn(canvas_size.pixel_width, canvas_size.pixel_height, |x, y| {
+        let i = data[canvas_size.coord_to_idx([x, y])];
+        image::Rgb(if i == max_iterations {
+            [0, 0, 0]
+        } else {
+            grad.get((i % n_colors) as f32 / n_colors as f32).into_rgb().to_pixel()
+        })
+    })
 }
 
 #[cfg(test)]
@@ -272,7 +290,7 @@ mod tests {
 
         let zoomed_again = zoomed.zoom(mpfr!(2.0));
         assert_eq!(zoomed_again.center(), [mpfr!(-0.5), mpfr!(0.0)]);
-        assert_eq!(zoomed_again.height(),mpfr!(0.5));
+        assert_eq!(zoomed_again.height(), mpfr!(0.5));
         assert_eq!(zoomed_again.width(), mpfr!(0.75));
     }
 
@@ -280,7 +298,8 @@ mod tests {
     fn test_move_center() {
         let c = CanvasSize::new_from_center(900, 600, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
-        assert_eq!(c.move_center([mpfr!(0.0), mpfr!(-1.0)]).center(), [mpfr!(0.0), mpfr!(-1.0)]);
+        assert_eq!(c.move_center([mpfr!(0.0), mpfr!(-1.0)]).center(),
+                   [mpfr!(0.0), mpfr!(-1.0)]);
     }
 
     #[test]
@@ -303,7 +322,8 @@ mod tests {
     #[test]
     fn test_iterate_all_prec() {
         let prec = 128;
-        let c = CanvasSize::new_from_center(2, 3, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0)).set_prec(prec);
+        let c = CanvasSize::new_from_center(2, 3, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0))
+            .set_prec(prec);
         let x = c.center()[0].clone();
         let y = c.center()[1].clone();
         let v = iterate_all::<Mpfr>(x, y, 10);
