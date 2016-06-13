@@ -10,7 +10,7 @@ path = "src/lib.rs"
 doc = false
 
 [dependencies]
-rust-mpfr = { git = "https://github.com/Moredread/rust-mpfr" }
+rust-mpfr = { git = "https://github.com/Moredread/rust-mpfr", branch = "wip" }
 image = "0.6"
 palette = "*"
 carboxyl = "0.2"
