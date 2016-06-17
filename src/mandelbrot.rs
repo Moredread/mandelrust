@@ -168,10 +168,20 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
 
     while &x * &x + &y * &y < T::from(4.0f64) && i < max_iterations {
         let xtemp = &x * &x - &y * &y + &x0;
-        y = T::from(2.0f64) * &x * &y + &y0;
-        x = xtemp;
-        v.push((x.clone(), y.clone()));
+        let ytemp = T::from(2.0f64) * &x * &y + &y0;
+
+        v.push((xtemp.clone(), ytemp.clone()));
         i += 1;
+
+        if x == xtemp && y == ytemp {
+            for _ in 0..(max_iterations - i) {
+                v.push((x.clone(), y.clone()));
+            }
+            i = max_iterations;
+        }
+
+        x = xtemp;
+        y = ytemp;
     }
 
     v
