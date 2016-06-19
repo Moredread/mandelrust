@@ -221,9 +221,9 @@ pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
 pub fn make_image(data: Vec<u32>, canvas_size: CanvasSize, max_iterations: u32) -> image::RgbImage {
     let n_colors = 256u32;
     let grad = Gradient::new(vec![
-                             Hsv::new(RgbHue::from(-179f32), 1.0, 1.0),
                              Hsv::new(RgbHue::from(0f32), 1.0, 1.0),
-                             Hsv::new(RgbHue::from(179f32), 1.0, 1.0)
+                             Hsv::new(RgbHue::from(180f32), 1.0, 1.0),
+                             Hsv::new(RgbHue::from(360f32), 1.0, 1.0)
                             ]);
 
     image::RgbImage::from_fn(canvas_size.pixel_width, canvas_size.pixel_height, |x, y| {
