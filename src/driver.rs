@@ -53,12 +53,13 @@ impl Driver<Communication<RgbImage, ()>> for Driver2d {
             {
                 let transform = graphics::math::abs_transform(w as f64, h as f64);
                 let mut backend = GliumGraphics::new(&mut backend_sys, &mut target);
+                let scale_factor = w as f64 / element.dimensions().0 as f64;
                 let texture = Texture::from_image(&mut glium_window,
                                                   &element.convert(),
                                                   &TextureSettings::new())
                                   .unwrap();
                 clear(color::BLACK, &mut backend);
-                image(&texture, transform.trans(0.0, 0.0), &mut backend);
+                image(&texture, transform.trans(0.0, 0.0).scale(scale_factor, scale_factor), &mut backend);
             }
             target.finish().unwrap();
         });

@@ -7,7 +7,7 @@ use mandelbrot::*;
 
 #[derive(Clone, Copy)]
 pub enum Action {
-    ZoomIn([f64; 2]),
+    ZoomIn([f64; 2], (u32, u32)),
     ZoomOut,
     MaxIterationsUp,
     MaxIterationsDown,
@@ -18,7 +18,7 @@ pub enum Action {
 pub fn intent(context: Context, event: Event) -> Option<Action> {
     match event {
         Press(Mouse(MouseButton::Left)) => {
-            Some(Action::ZoomIn([context.cursor.position.0, context.cursor.position.1]))
+            Some(Action::ZoomIn([context.cursor.position.0, context.cursor.position.1], context.window.size))
         }
         Press(Mouse(MouseButton::Right)) => Some(Action::ZoomOut),
         Press(Keyboard(Key::PageUp)) => Some(Action::MaxIterationsUp),
@@ -57,8 +57,11 @@ pub fn init(canvas: CanvasSize, max: u32) -> State {
 
 pub fn update(current: State, action: Action) -> State {
     match action {
-        Action::ZoomIn(l) => {
-            State::calc(current.canvas.move_center_to_pixel(l).zoom(mpfr!(8.0)),
+        Action::ZoomIn(loc, win_size) => {
+            let (x, y) = win_size;
+            let scale_factor = x as f64 / current.image.dimensions().0 as f64;
+            let scaled_loc: [f64; 2] = [loc[0] / scale_factor, loc[1] / scale_factor];
+            State::calc(current.canvas.move_center_to_pixel(scaled_loc).zoom(mpfr!(8.0)),
                         current.max)
         }
         Action::ZoomOut => State::calc(current.canvas.zoom(mpfr!(1.0) / 8.0), current.max),
