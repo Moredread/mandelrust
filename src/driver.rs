@@ -57,9 +57,11 @@ impl Driver<Communication<RgbImage, ()>> for Driver2d {
                 let texture = Texture::from_image(&mut glium_window,
                                                   &element.convert(),
                                                   &TextureSettings::new())
-                                  .unwrap();
+                    .unwrap();
                 clear(color::BLACK, &mut backend);
-                image(&texture, transform.trans(0.0, 0.0).scale(scale_factor, scale_factor), &mut backend);
+                image(&texture,
+                      transform.trans(0.0, 0.0).scale(scale_factor, scale_factor),
+                      &mut backend);
             }
             target.finish().unwrap();
         });

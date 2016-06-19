@@ -18,7 +18,8 @@ pub enum Action {
 pub fn intent(context: Context, event: Event) -> Option<Action> {
     match event {
         Press(Mouse(MouseButton::Left)) => {
-            Some(Action::ZoomIn([context.cursor.position.0, context.cursor.position.1], context.window.size))
+            Some(Action::ZoomIn([context.cursor.position.0, context.cursor.position.1],
+                                context.window.size))
         }
         Press(Mouse(MouseButton::Right)) => Some(Action::ZoomOut),
         Press(Keyboard(Key::PageUp)) => Some(Action::MaxIterationsUp),
@@ -68,13 +69,15 @@ pub fn update(current: State, action: Action) -> State {
         Action::MaxIterationsUp => {
             println!("Max. iterations: {}", current.max + 1000);
             State::calc(current.canvas, current.max + 1000)
-        },
+        }
         Action::MaxIterationsDown => {
             if current.max > 1000 {
                 println!("Max. iterations: {}", current.max - 1000);
                 State::calc(current.canvas, current.max - 1000)
-            } else { current }
-        },
+            } else {
+                current
+            }
+        }
         Action::PrecisionUp => {
             println!("{}", current.canvas.get_prec() * 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() * 2);
@@ -82,12 +85,12 @@ pub fn update(current: State, action: Action) -> State {
             println!("a: {}", a.canvas.center()[0].get_prec());
             println!("b: {}", a.canvas.coordinates([0, 0])[0].get_prec());
             a
-        },
+        }
         Action::PrecisionDown => {
             println!("{}", current.canvas.get_prec() / 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() / 2);
             State::calc(new, current.max)
-        },
+        }
     }
 }
 
