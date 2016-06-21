@@ -196,7 +196,7 @@ pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64,
     let c_n1 = 2f64 * c_n * x_n + a_n * b_n;
     let x_n1 = a_n1 * d + b_n1 * d * d + c_n1 * d * d * d;
 
-    return (x_n1, [a_n1, b_n1, c_n1]);
+    (x_n1, [a_n1, b_n1, c_n1])
 }
 
 pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
