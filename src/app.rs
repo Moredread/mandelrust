@@ -35,17 +35,26 @@ pub struct State {
     image: RgbImage,
     canvas: CanvasSize,
     max: u32,
+    calculator: Calculator,
+}
+
+#[derive(Clone)]
+enum Calculator {
+    MPFR,
 }
 
 impl State {
-    fn calc(canvas: CanvasSize, max: u32) -> State {
-        let v = calculate_all(canvas.clone(), max);
+    fn calc(canvas: CanvasSize, max: u32, calc: Calculator) -> State {
+        let v = match calc {
+            Calculator::MPFR => calculate_all(canvas.clone(), max),
+        };
         let imgbuf = make_image(v, canvas.clone(), max);
 
         State {
             image: imgbuf,
             canvas: canvas.clone(),
             max: max,
+            calculator: calc,
         }
     }
 }
@@ -53,7 +62,7 @@ impl State {
 pub type View = RgbImage;
 
 pub fn init(canvas: CanvasSize, max: u32) -> State {
-    State::calc(canvas, max)
+    State::calc(canvas, max, Calculator::MPFR)
 }
 
 pub fn update(current: State, action: Action) -> State {
@@ -63,17 +72,17 @@ pub fn update(current: State, action: Action) -> State {
             let scale_factor = x as f64 / current.image.dimensions().0 as f64;
             let scaled_loc: [f64; 2] = [loc[0] / scale_factor, loc[1] / scale_factor];
             State::calc(current.canvas.move_center_to_pixel(scaled_loc).zoom(mpfr!(8.0)),
-                        current.max)
+                        current.max, current.calculator)
         }
-        Action::ZoomOut => State::calc(current.canvas.zoom(mpfr!(1.0) / 8.0), current.max),
+        Action::ZoomOut => State::calc(current.canvas.zoom(mpfr!(1.0) / 8.0), current.max, current.calculator),
         Action::MaxIterationsUp => {
             println!("Max. iterations: {}", current.max + 1000);
-            State::calc(current.canvas, current.max + 1000)
+            State::calc(current.canvas, current.max + 1000, current.calculator)
         }
         Action::MaxIterationsDown => {
             if current.max > 1000 {
                 println!("Max. iterations: {}", current.max - 1000);
-                State::calc(current.canvas, current.max - 1000)
+                State::calc(current.canvas, current.max - 1000, current.calculator)
             } else {
                 current
             }
@@ -81,7 +90,7 @@ pub fn update(current: State, action: Action) -> State {
         Action::PrecisionUp => {
             println!("{}", current.canvas.get_prec() * 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() * 2);
-            let a = State::calc(new, current.max);
+            let a = State::calc(new, current.max, current.calculator);
             println!("a: {}", a.canvas.center()[0].get_prec());
             println!("b: {}", a.canvas.coordinates([0, 0])[0].get_prec());
             a
@@ -89,7 +98,7 @@ pub fn update(current: State, action: Action) -> State {
         Action::PrecisionDown => {
             println!("{}", current.canvas.get_prec() / 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() / 2);
-            State::calc(new, current.max)
+            State::calc(new, current.max, current.calculator)
         }
     }
 }
