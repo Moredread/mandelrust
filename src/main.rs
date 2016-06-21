@@ -42,8 +42,8 @@ fn main() {
     let x = Mpfr::new2_from_str(prec, x_, 10).expect("Wrong literal");
     let y = Mpfr::new2_from_str(prec, y_, 10).expect("Wrong literal");
     let zoom = Mpfr::new2_from_str(prec, zoom_, 10).expect("Wrong literal");
-    println!("{}", (&x * &y + &zoom).get_prec());
-    println!("{}", &x * 2);
+    println!("Initial precision: {}", (&x * &y + &zoom).get_prec());
+
     let canvas = CanvasSize::new_from_center(400, 200, [x, y], zoom).set_prec(128);
     let max = 1000u32;
 
