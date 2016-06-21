@@ -46,7 +46,7 @@ enum Calculator {
 impl State {
     fn calc(canvas: CanvasSize, max: u32, calc: Calculator) -> State {
         let v = match calc {
-            Calculator::MPFR => calculate_all(canvas.clone(), max),
+            Calculator::MPFR => calculate_all_mpfr(canvas.clone(), max),
         };
         let imgbuf = make_image(v, canvas.clone(), max);
 

@@ -31,14 +31,14 @@ fn bench_calculate_all(b: &mut Bencher) {
     let max = 1000;
     let c = CanvasSize::new_from_center(50, 50, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
 
-    b.iter(|| calculate_all(c.clone(), max));
+    b.iter(|| calculate_all_mpfr(c.clone(), max));
 }
 
 #[bench]
 fn bench_make_image(b: &mut Bencher) {
     let max = 1000;
     let c = CanvasSize::new_from_center(50, 50, [mpfr!(-0.5), mpfr!(0.0)], mpfr!(1.0));
-    let data = calculate_all(c.clone(), max);
+    let data = calculate_all_mpfr(c.clone(), max);
 
     b.iter(|| make_image(data.clone(), c.clone(), max));
 }

@@ -199,7 +199,7 @@ pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64,
     (x_n1, [a_n1, b_n1, c_n1])
 }
 
-pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
+pub fn calculate_all_mpfr(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     let mut v: Vec<u32> = Vec::new();
     (0..canvas_size.pixel_count())
         .into_par_iter()
