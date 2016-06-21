@@ -44,6 +44,7 @@ pub struct State {
 enum Generator {
     MPFR,
     DELTA,
+    FLOAT,
 }
 
 impl State {
@@ -51,6 +52,7 @@ impl State {
         let v = match gen {
             Generator::MPFR => calculate_all_mpfr(canvas.clone(), max),
             Generator::DELTA => calculate_all_delta(canvas.clone(), max),
+            Generator::FLOAT => calculate_all_float(canvas.clone(), max),
         };
         let imgbuf = make_image(v, canvas.clone(), max);
 
@@ -66,7 +68,7 @@ impl State {
 pub type View = RgbImage;
 
 pub fn init(canvas: CanvasSize, max: u32) -> State {
-    State::calc(canvas, max, Generator::MPFR)
+    State::calc(canvas, max, Generator::FLOAT)
 }
 
 pub fn update(current: State, action: Action) -> State {
@@ -106,8 +108,9 @@ pub fn update(current: State, action: Action) -> State {
         },
         Action::SwitchGenerator => {
             let new_gen = match current.generator {
+                Generator::FLOAT => Generator::MPFR,
                 Generator::MPFR => Generator::DELTA,
-                Generator::DELTA => Generator::MPFR,
+                Generator::DELTA => Generator::FLOAT,
             };
             println!("Use Generator: {:?}", new_gen);
             State::calc(current.canvas, current.max, new_gen)

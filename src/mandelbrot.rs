@@ -153,7 +153,7 @@ pub fn iterate<T>(x0: T, y0: T, max_iterations: u32) -> Option<u32>
     }
 }
 
-pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
+pub fn iterate_all_start<T>(x0: T, y0: T, x_start: T, y_start: T, max_iterations: u32) -> Vec<(T, T)>
     where T: Add<Output=T> + for<'a> Add<&'a T, Output=T>
            + Mul<Output=T> + for<'a> Mul<&'a T, Output=T>
            + Neg + Sub<Output=T> + From<f64>
@@ -161,8 +161,8 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
           for <'a> &'a T: Mul<Output=T>
 {
     let mut i = 0;
-    let mut x = T::from(0.0f64);
-    let mut y = T::from(0.0f64);
+    let mut x = x_start.clone();
+    let mut y = y_start.clone();
     let mut v = Vec::new();
 
     while &x * &x + &y * &y < T::from(4.0f64) && i < max_iterations {
@@ -186,7 +186,21 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
     v
 }
 
-pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64, [Complex64; 3]) {
+
+pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
+    where T: Add<Output=T> + for<'a> Add<&'a T, Output=T>
+           + Mul<Output=T> + for<'a> Mul<&'a T, Output=T>
+           + Neg + Sub<Output=T> + From<f64>
+           + Clone + PartialOrd + Display,
+          for <'a> &'a T: Mul<Output=T>
+{
+    let x = T::from(0.0f64);
+    let y = T::from(0.0f64);
+
+    iterate_all_start::<T>(x0, y0, x, y, max_iterations)
+}
+
+pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 3]) -> (Complex64, [Complex64; 3]) {
     let a_n = input[0];
     let b_n = input[1];
     let c_n = input[2];
@@ -197,6 +211,43 @@ pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64,
     let x_n1 = a_n1 * d + b_n1 * d * d + c_n1 * d * d * d;
 
     (x_n1, [a_n1, b_n1, c_n1])
+}
+
+pub fn iterate_delta<'a>(reference: &'a Vec<(Mpfr, Mpfr)>, d_x: f64, d_y: f64) -> Vec<(f64, f64)> {
+    pub fn mpfr_to_complex<'a, 'b>(x: &'a Mpfr, y: &'b Mpfr) -> Complex64 {
+        let x_: f64 = x.into();
+        let y_: f64 = y.into();
+
+        Complex64::new(x_, y_)
+    }
+
+    let a0 = Complex64::new(1f64, 0f64);
+    let b0 = Complex64::new(0f64, 0f64);
+    let c0 = Complex64::new(0f64, 0f64);
+    let mut input = [a0, b0, c0];
+    let d = Complex64::new(d_x, d_y);
+    let x0 = mpfr_to_complex(&reference[0].0, &reference[0].1);
+    let mut x = x0;
+
+    let mut v = Vec::<(f64, f64)>::new();
+
+    v.push((x.re, x.im));
+
+    let mut i = 1;
+
+    while i < reference.len() && x.norm() <= 2f64 {
+        let x_n = mpfr_to_complex(&reference[i].0, &reference[i].1);
+        let (delta_n, input_new) = delta(d, x_n, input);
+
+        x = x_n + delta_n;
+//        println("X: {}", x - mpfr_to_complex(&reference[i + 1].0, &reference[i].1));
+        input = input_new;
+
+        v.push((x.re, x.im));
+        i = i + 1;
+    }
+
+    v
 }
 
 pub fn calculate_all_mpfr(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
@@ -213,15 +264,58 @@ pub fn calculate_all_mpfr(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u
     v
 }
 
-pub fn calculate_all_delta(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
+pub fn calculate_all_float(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     let mut v: Vec<u32> = Vec::new();
     (0..canvas_size.pixel_count())
         .into_par_iter()
         .weight_max()
         .map(|i| canvas_size.coordinates(canvas_size.idx_to_coord(i as usize)))
         .map(|c| {
-            iterate::<Mpfr>((c[0].clone()), (c[1].clone()), max_iterations)
+            iterate::<f64>(Into::<f64>::into(&c[0]), Into::<f64>::into(&c[1]), max_iterations)
                 .unwrap_or(max_iterations)
+        })
+        .collect_into(&mut v);
+    v
+}
+
+pub fn calculate_all_delta(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
+    let mut v: Vec<u32> = Vec::new();
+    let reference_coord = canvas_size.coordinates(canvas_size.idx_to_coord(0));
+    let reference = iterate_all::<Mpfr>(reference_coord[0].clone(), reference_coord[1].clone(), max_iterations);
+    println!("Ref {} {}", reference.len(), max_iterations - reference.len() as u32);
+    (0..canvas_size.pixel_count())
+        .into_par_iter()
+        .weight_max()
+        .map(|i| canvas_size.coordinates(canvas_size.idx_to_coord(i as usize)))
+        .map(|c| {
+            let d_x: f64 = (&(&c[0] - &reference_coord[0])).into();
+            let d_y: f64 = (&(&c[1] - &reference_coord[1])).into();
+
+            let v = iterate_delta(&reference, d_x, d_y);
+
+            if reference.len() - v.len() == 0 {
+               println!("{} {}", v.len(), reference.len() - v.len());
+            }
+
+            let mut i = v.len();
+
+            if reference.len() - v.len() <= 0 {
+                println!("Additional calc: {}", reference.len() - v.len());
+
+                let last_x = Into::<Mpfr>::into(v[v.len() - 1].0);
+                let last_y = Into::<Mpfr>::into(v[v.len() - 1].1);
+
+                let remaining = (max_iterations as usize - v.len()) as u32;
+
+                let v_mpfr = iterate_all_start::<Mpfr>(c[0].clone(), c[1].clone(), last_x, last_y, remaining);
+                i += v_mpfr.len();
+                println!("After: {} {} {}", i, v_mpfr.len(), remaining);
+            }
+
+            v.len() as u32
+
+//            iterate::<Mpfr>((c[0].clone()), (c[1].clone()), max_iterations)
+//                .unwrap_or(max_iterations)
         })
         .collect_into(&mut v);
     v
