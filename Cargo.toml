@@ -26,3 +26,4 @@ piston = "0.17"
 pistoncore-input = "0.8"
 rayon = "*"
 num = "0.1"
+clippy = { version = "^0.*", optional = true }
