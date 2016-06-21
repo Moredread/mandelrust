@@ -213,7 +213,7 @@ pub fn calculate_all(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
     v
 }
 
-pub fn color_from_iteration(iterations: u32, max_iterations: u32) -> [u8; 3] {
+fn color_from_iteration(iterations: u32, max_iterations: u32) -> [u8; 3] {
     const N_COLORS: u32 = 256u32;
     const BLACK: [u8; 3] = [0u8, 0u8, 0u8];
 
