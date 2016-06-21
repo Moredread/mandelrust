@@ -1,8 +1,7 @@
-use palette::{Rgb, Hsv, Gradient, IntoColor, RgbHue};
+use palette::{Hsv, Gradient, IntoColor, RgbHue};
 use std::ops::{Mul, Add, Neg, Sub};
 use rayon::prelude::*;
 use rust_mpfr::mpfr::*;
-use std::cmp;
 use image;
 use num::complex::Complex64;
 use std::fmt::Display;
@@ -185,10 +184,6 @@ pub fn iterate_all<T>(x0: T, y0: T, max_iterations: u32) -> Vec<(T, T)>
     }
 
     v
-}
-
-pub fn iterate_delta(d: Complex64, x_n: Complex64, max_iterations: u32) -> Option<u32> {
-    None
 }
 
 pub fn delta(d: Complex64, x_n: Complex64, input: [Complex64; 4]) -> (Complex64, [Complex64; 3]) {

@@ -59,7 +59,7 @@ pub fn init(canvas: CanvasSize, max: u32) -> State {
 pub fn update(current: State, action: Action) -> State {
     match action {
         Action::ZoomIn(loc, win_size) => {
-            let (x, y) = win_size;
+            let (x, _) = win_size;
             let scale_factor = x as f64 / current.image.dimensions().0 as f64;
             let scaled_loc: [f64; 2] = [loc[0] / scale_factor, loc[1] / scale_factor];
             State::calc(current.canvas.move_center_to_pixel(scaled_loc).zoom(mpfr!(8.0)),
