@@ -13,6 +13,7 @@ pub enum Action {
     MaxIterationsDown,
     PrecisionUp,
     PrecisionDown,
+    SwitchCalculator,
 }
 
 pub fn intent(context: Context, event: Event) -> Option<Action> {
@@ -26,6 +27,7 @@ pub fn intent(context: Context, event: Event) -> Option<Action> {
         Press(Keyboard(Key::PageDown)) => Some(Action::MaxIterationsDown),
         Press(Keyboard(Key::Home)) => Some(Action::PrecisionUp),
         Press(Keyboard(Key::End)) => Some(Action::PrecisionDown),
+        Press(Keyboard(Key::F1)) => Some(Action::SwitchCalculator),
         _ => None,
     }
 }
@@ -38,15 +40,17 @@ pub struct State {
     calculator: Calculator,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum Calculator {
     MPFR,
+    DELTA,
 }
 
 impl State {
     fn calc(canvas: CanvasSize, max: u32, calc: Calculator) -> State {
         let v = match calc {
             Calculator::MPFR => calculate_all_mpfr(canvas.clone(), max),
+            Calculator::DELTA => calculate_all_delta(canvas.clone(), max),
         };
         let imgbuf = make_image(v, canvas.clone(), max);
 
@@ -99,6 +103,14 @@ pub fn update(current: State, action: Action) -> State {
             println!("{}", current.canvas.get_prec() / 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() / 2);
             State::calc(new, current.max, current.calculator)
+        },
+        Action::SwitchCalculator => {
+            let new_calc = match current.calculator {
+                Calculator::MPFR => Calculator::DELTA,
+                Calculator::DELTA => Calculator::MPFR,
+            };
+            println!("Use calculator: {:?}", new_calc);
+            State::calc(current.canvas, current.max, new_calc)
         }
     }
 }

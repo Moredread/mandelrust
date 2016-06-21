@@ -213,6 +213,20 @@ pub fn calculate_all_mpfr(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u
     v
 }
 
+pub fn calculate_all_delta(canvas_size: CanvasSize, max_iterations: u32) -> Vec<u32> {
+    let mut v: Vec<u32> = Vec::new();
+    (0..canvas_size.pixel_count())
+        .into_par_iter()
+        .weight_max()
+        .map(|i| canvas_size.coordinates(canvas_size.idx_to_coord(i as usize)))
+        .map(|c| {
+            iterate::<Mpfr>((c[0].clone()), (c[1].clone()), max_iterations)
+                .unwrap_or(max_iterations)
+        })
+        .collect_into(&mut v);
+    v
+}
+
 fn color_from_iteration(iterations: u32, max_iterations: u32) -> [u8; 3] {
     const N_COLORS: u32 = 256u32;
     const BLACK: [u8; 3] = [0u8, 0u8, 0u8];
