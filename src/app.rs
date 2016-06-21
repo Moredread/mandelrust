@@ -13,7 +13,7 @@ pub enum Action {
     MaxIterationsDown,
     PrecisionUp,
     PrecisionDown,
-    SwitchCalculator,
+    SwitchGenerator,
 }
 
 pub fn intent(context: Context, event: Event) -> Option<Action> {
@@ -27,7 +27,7 @@ pub fn intent(context: Context, event: Event) -> Option<Action> {
         Press(Keyboard(Key::PageDown)) => Some(Action::MaxIterationsDown),
         Press(Keyboard(Key::Home)) => Some(Action::PrecisionUp),
         Press(Keyboard(Key::End)) => Some(Action::PrecisionDown),
-        Press(Keyboard(Key::F1)) => Some(Action::SwitchCalculator),
+        Press(Keyboard(Key::F1)) => Some(Action::SwitchGenerator),
         _ => None,
     }
 }
@@ -37,20 +37,20 @@ pub struct State {
     image: RgbImage,
     canvas: CanvasSize,
     max: u32,
-    calculator: Calculator,
+    generator: Generator,
 }
 
 #[derive(Clone, Debug)]
-enum Calculator {
+enum Generator {
     MPFR,
     DELTA,
 }
 
 impl State {
-    fn calc(canvas: CanvasSize, max: u32, calc: Calculator) -> State {
-        let v = match calc {
-            Calculator::MPFR => calculate_all_mpfr(canvas.clone(), max),
-            Calculator::DELTA => calculate_all_delta(canvas.clone(), max),
+    fn calc(canvas: CanvasSize, max: u32, gen: Generator) -> State {
+        let v = match gen {
+            Generator::MPFR => calculate_all_mpfr(canvas.clone(), max),
+            Generator::DELTA => calculate_all_delta(canvas.clone(), max),
         };
         let imgbuf = make_image(v, canvas.clone(), max);
 
@@ -58,7 +58,7 @@ impl State {
             image: imgbuf,
             canvas: canvas.clone(),
             max: max,
-            calculator: calc,
+            generator: gen,
         }
     }
 }
@@ -66,7 +66,7 @@ impl State {
 pub type View = RgbImage;
 
 pub fn init(canvas: CanvasSize, max: u32) -> State {
-    State::calc(canvas, max, Calculator::MPFR)
+    State::calc(canvas, max, Generator::MPFR)
 }
 
 pub fn update(current: State, action: Action) -> State {
@@ -76,17 +76,17 @@ pub fn update(current: State, action: Action) -> State {
             let scale_factor = x as f64 / current.image.dimensions().0 as f64;
             let scaled_loc: [f64; 2] = [loc[0] / scale_factor, loc[1] / scale_factor];
             State::calc(current.canvas.move_center_to_pixel(scaled_loc).zoom(mpfr!(8.0)),
-                        current.max, current.calculator)
+                        current.max, current.generator)
         }
-        Action::ZoomOut => State::calc(current.canvas.zoom(mpfr!(1.0) / 8.0), current.max, current.calculator),
+        Action::ZoomOut => State::calc(current.canvas.zoom(mpfr!(1.0) / 8.0), current.max, current.generator),
         Action::MaxIterationsUp => {
             println!("Max. iterations: {}", current.max + 1000);
-            State::calc(current.canvas, current.max + 1000, current.calculator)
+            State::calc(current.canvas, current.max + 1000, current.generator)
         }
         Action::MaxIterationsDown => {
             if current.max > 1000 {
                 println!("Max. iterations: {}", current.max - 1000);
-                State::calc(current.canvas, current.max - 1000, current.calculator)
+                State::calc(current.canvas, current.max - 1000, current.generator)
             } else {
                 current
             }
@@ -94,7 +94,7 @@ pub fn update(current: State, action: Action) -> State {
         Action::PrecisionUp => {
             println!("{}", current.canvas.get_prec() * 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() * 2);
-            let a = State::calc(new, current.max, current.calculator);
+            let a = State::calc(new, current.max, current.generator);
             println!("a: {}", a.canvas.center()[0].get_prec());
             println!("b: {}", a.canvas.coordinates([0, 0])[0].get_prec());
             a
@@ -102,15 +102,15 @@ pub fn update(current: State, action: Action) -> State {
         Action::PrecisionDown => {
             println!("{}", current.canvas.get_prec() / 2);
             let new = current.canvas.set_prec(current.canvas.get_prec() / 2);
-            State::calc(new, current.max, current.calculator)
+            State::calc(new, current.max, current.generator)
         },
-        Action::SwitchCalculator => {
-            let new_calc = match current.calculator {
-                Calculator::MPFR => Calculator::DELTA,
-                Calculator::DELTA => Calculator::MPFR,
+        Action::SwitchGenerator => {
+            let new_gen = match current.generator {
+                Generator::MPFR => Generator::DELTA,
+                Generator::DELTA => Generator::MPFR,
             };
-            println!("Use calculator: {:?}", new_calc);
-            State::calc(current.canvas, current.max, new_calc)
+            println!("Use Generator: {:?}", new_gen);
+            State::calc(current.canvas, current.max, new_gen)
         }
     }
 }
