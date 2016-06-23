@@ -1,3 +1,6 @@
+#![warn(trivial_casts)]
+#![warn(trivial_numeric_casts)]
+
 extern crate mandelrust;
 extern crate graphics;
 extern crate glium;
