@@ -2,8 +2,8 @@ Mandelrust
 ==========
 
 [![Build Status](https://travis-ci.org/Moredread/mandelrust.svg?branch=master)](https://travis-ci.org/Moredread/mandelrust)
-[![Coverage Status](https://coveralls.io/repos/github/Moredread/mandelrust/badge.svg?branch=master)](https://coveralls.io/github/Moredread/mandelrust?branch=master)
 [![Clippy Linting Result](https://clippy.bashy.io/github/Moredread/mandelrust/master/badge.svg)](https://clippy.bashy.io/github/Moredread/mandelrust/master/log)
+[![Coverage Status](https://coveralls.io/repos/github/Moredread/mandelrust/badge.svg?branch=master)](https://coveralls.io/github/Moredread/mandelrust?branch=master)
 
 [Online documentation][docs]
 
