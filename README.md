@@ -2,7 +2,7 @@ Mandelrust
 ==========
 
 [![Build Status](https://travis-ci.org/Moredread/mandelrust.svg?branch=master)](https://travis-ci.org/Moredread/mandelrust)
-[![Clippy Linting Result](https://clippy.bashy.io/github/Moredread/mandelrust/master/badge.svg?style=plastic)](https://clippy.bashy.io/github/Moredread/mandelrust/master/log)
+[![Clippy Linting Result](https://clippy.bashy.io/github/Moredread/mandelrust/master/badge.svg)](https://clippy.bashy.io/github/Moredread/mandelrust/master/log)
 
 [Online documentation][docs]
 
