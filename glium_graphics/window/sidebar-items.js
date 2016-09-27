@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["GliumWindow","A window struct for glium."]]});

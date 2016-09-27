@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Event",""]],"struct":[["Context",""],["Cursor",""],["SourceWindow","A reactive window implementation generic over the event source."],["WindowProperties",""]],"trait":[["RunnableWindow","An abstraction of a window's event generation facilities."],["StreamingWindow",""]]});

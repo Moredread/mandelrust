@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["calculate_all_delta",""],["calculate_all_mpfr",""],["delta",""],["iterate",""],["iterate_all",""],["make_image",""]],"struct":[["CanvasSize",""]]});

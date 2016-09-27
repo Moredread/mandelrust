@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `SourceWindow` struct in crate `carboxyl_window`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SourceWindow">
+
+    <title>carboxyl_window::SourceWindow - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>carboxyl_window</a></p><script>window.sidebarCurrent = {name: 'SourceWindow', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>carboxyl_window</a>::<wbr><a class='struct' href=''>SourceWindow</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-42' class='srclink' href='../src/carboxyl_window/source_win.rs.html#45-49' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct SourceWindow&lt;S&gt; {
+    // some fields omitted
+}</pre><div class='docblock'><p>A reactive window implementation generic over the event source.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;S&gt; <a class='struct' href='../carboxyl_window/struct.SourceWindow.html' title='carboxyl_window::SourceWindow'>SourceWindow</a>&lt;S&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-47' class='srclink' href='../src/carboxyl_window/source_win.rs.html#51-81' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(source: S) -&gt; <a class='struct' href='../carboxyl_window/struct.SourceWindow.html' title='carboxyl_window::SourceWindow'>SourceWindow</a>&lt;S&gt;</code></h4>
+<div class='docblock'><p>Create a new Glium loop.</p>
+
+<h1 id='parameters' class='section-header'><a href='#parameters'>Parameters</a></h1>
+<p><code>tick_length</code> is the minimum duration of a tick in nanoseconds.</p>
+</div><h4 id='method.set_capture' class='method'><code>fn <a href='#method.set_capture' class='fnname'>set_capture</a>(&amp;mut self, capture: <a class='struct' href='../carboxyl/signal/struct.Signal.html' title='carboxyl::signal::Signal'>Signal</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;)</code></h4>
+<div class='docblock'><p>Mutably set cursor capturing signal</p>
+</div><h4 id='method.capture' class='method'><code>fn <a href='#method.capture' class='fnname'>capture</a>(self, capture: <a class='struct' href='../carboxyl/signal/struct.Signal.html' title='carboxyl::signal::Signal'>Signal</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;) -&gt; <a class='struct' href='../carboxyl_window/struct.SourceWindow.html' title='carboxyl_window::SourceWindow'>SourceWindow</a>&lt;S&gt;</code></h4>
+<div class='docblock'><p>Provide cursor capturing signal</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;S&gt; <a class='trait' href='../carboxyl_window/trait.RunnableWindow.html' title='carboxyl_window::RunnableWindow'>RunnableWindow</a> for <a class='struct' href='../carboxyl_window/struct.SourceWindow.html' title='carboxyl_window::SourceWindow'>SourceWindow</a>&lt;S&gt; <span class='where'>where S: Borrowing, S::Target: <a class='trait' href='../window/trait.Window.html' title='window::Window'>Window</a>&lt;Event=<a class='enum' href='../input/enum.Input.html' title='input::Input'>Input</a>&gt; + <a class='trait' href='../window/trait.AdvancedWindow.html' title='window::AdvancedWindow'>AdvancedWindow</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-57' class='srclink' href='../src/carboxyl_window/source_win.rs.html#83-109' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.run_with' class='method'><code>fn <a href='../carboxyl_window/trait.RunnableWindow.html#tymethod.run_with' class='fnname'>run_with</a>&lt;F:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>()&gt;(&amp;mut self, fps: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, render: F)</code></h4>
+<div class='docblock'><p>Run the window, calling a function every frame</p>
+</div><h4 id='method.run' class='method'><code>fn <a href='../carboxyl_window/trait.RunnableWindow.html#method.run' class='fnname'>run</a>(&amp;mut self, fps: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>)</code></h4>
+<div class='docblock'><p>Run the window generating events</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;S&gt; <a class='trait' href='../carboxyl_window/trait.StreamingWindow.html' title='carboxyl_window::StreamingWindow'>StreamingWindow</a> for <a class='struct' href='../carboxyl_window/struct.SourceWindow.html' title='carboxyl_window::SourceWindow'>SourceWindow</a>&lt;S&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-74' class='srclink' href='../src/carboxyl_window/source_win.rs.html#111-122' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.context' class='method'><code>fn <a href='../carboxyl_window/trait.StreamingWindow.html#tymethod.context' class='fnname'>context</a>(&amp;self) -&gt; <a class='struct' href='../carboxyl/signal/struct.Signal.html' title='carboxyl::signal::Signal'>Signal</a>&lt;<a class='struct' href='../carboxyl_window/struct.Context.html' title='carboxyl_window::Context'>Context</a>&gt;</code></h4>
+<h4 id='method.events' class='method'><code>fn <a href='../carboxyl_window/trait.StreamingWindow.html#tymethod.events' class='fnname'>events</a>(&amp;self) -&gt; <a class='struct' href='../carboxyl/stream/struct.Stream.html' title='carboxyl::stream::Stream'>Stream</a>&lt;<a class='enum' href='../carboxyl_window/enum.Event.html' title='carboxyl_window::Event'>Event</a>&gt;</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "carboxyl_window";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

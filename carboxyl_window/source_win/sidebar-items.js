@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SourceWindow","A reactive window implementation generic over the event source."]]});

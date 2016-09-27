@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Filter","OpenGL Resize Filters"]],"mod":[["ops","Image operations for textures."]],"struct":[["TextureSettings","Texture creation parameters."]],"trait":[["ImageSize","Implemented by all images to be used with generic algorithms."],["Rgba8Texture","Implemented by rgba8 textures."]]});
