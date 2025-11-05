@@ -3,6 +3,7 @@ name = "mandelrust"
 version = "0.1.0"
 authors = ["André-Patrick Bubel <code@andre-bubel.de>"]
 license = "GPL-3.0+"
+edition = "2021"
 
 [lib]
 name = "mandelrust"
@@ -10,20 +11,22 @@ path = "src/lib.rs"
 doc = false
 
 [dependencies]
-rust-mpfr = { git = "https://github.com/Moredread/rust-mpfr", branch = "wip" }
-image = "0.6"
-palette = "*"
-carboxyl = "0.2"
-carboxyl_window = "0.0.3"
-benzene = "0.2"
-glutin = "0.4"
-shader_version = "0.2"
-pistoncore-glutin_window = "0.20"
-piston2d-graphics = "0.13"
-piston2d-glium_graphics = "0.19"
-glium = "0.13"
-piston = "0.17"
-pistoncore-input = "0.8"
-rayon = "*"
-num = "0.1"
-clippy = { version = "^0.*", optional = true }
+rug = { version = "1.26", features = ["float"] }
+image = "0.25"
+palette = "0.7"
+rayon = "1.10"
+num = "0.4"
+
+# Removing old Piston dependencies - the project will need to be refactored
+# to use a modern graphics framework if interactive rendering is needed
+# carboxyl = "0.2"
+# carboxyl_window = "0.0.3"
+# benzene = "0.2"
+# glutin = "0.4"
+# shader_version = "0.2"
+# pistoncore-glutin_window = "0.20"
+# piston2d-graphics = "0.13"
+# piston2d-glium_graphics = "0.19"
+# glium = "0.13"
+# piston = "0.17"
+# pistoncore-input = "0.8"
