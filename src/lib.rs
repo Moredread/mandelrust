@@ -1,1 +1,3 @@
-pub mod mandelbrot;
+// Roguelike game library
+
+pub mod roguelike;

@@ -11,22 +11,7 @@ path = "src/lib.rs"
 doc = false
 
 [dependencies]
-rug = "1.24"
-image = "0.25"
-palette = "0.7"
-rayon = "1.10"
-num = "0.4"
+rand = "0.8"
+crossterm = "0.27"
 
-# GUI dependencies - temporarily disabled for initial modernization
-# These need significant updates or replacement
-# carboxyl = "0.2"
-# carboxyl_window = "0.0.3"
-# benzene = "0.2"
-# glutin = "0.4"
-# shader_version = "0.2"
-# pistoncore-glutin_window = "0.20"
-# piston2d-graphics = "0.13"
-# piston2d-glium_graphics = "0.19"
-# glium = "0.13"
-# piston = "0.17"
-# pistoncore-input = "0.8"
+[dev-dependencies]
