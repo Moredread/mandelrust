@@ -7,7 +7,8 @@ use num::complex::Complex64;
 use std::fmt::Display;
 
 // Default precision for MPFR floats (in bits)
-#[allow(dead_code)]
+// Used in test helper macro
+#[cfg_attr(not(test), allow(dead_code))]
 const DEFAULT_PREC: u32 = 53;
 
 #[derive(Clone)]
