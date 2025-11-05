@@ -1,7 +1,7 @@
 use palette::{Hsv, Srgb, IntoColor};
 use std::ops::{Mul, Add, Neg, Sub};
 use rayon::prelude::*;
-use rug::Float;
+use rug::{Float, Assign};
 use image;
 use num::complex::Complex64;
 use std::fmt::Display;
@@ -218,14 +218,20 @@ pub fn iterate_all_float(x0: Float, y0: Float, max_iterations: u32) -> Vec<(Floa
 
     let four = Float::with_val(prec, 4.0);
     let two = Float::with_val(prec, 2.0);
+    let mut magnitude_squared = Float::with_val(prec, 0.0);
 
-    while Float::with_val(prec, &x * &x + &y * &y) < four && i < max_iterations {
+    // Calculate initial magnitude
+    magnitude_squared.assign(&x * &x + &y * &y);
+
+    while magnitude_squared < four && i < max_iterations {
         let x_squared = Float::with_val(prec, &x * &x);
         let y_squared = Float::with_val(prec, &y * &y);
-        let xtemp = Float::with_val(prec, x_squared - y_squared + &x0);
+        let x_diff = Float::with_val(prec, &x_squared - &y_squared);
+        let xtemp = Float::with_val(prec, x_diff + &x0);
 
         let two_x = Float::with_val(prec, &two * &x);
-        let ytemp = Float::with_val(prec, two_x * &y + &y0);
+        let xy_prod = Float::with_val(prec, two_x * &y);
+        let ytemp = Float::with_val(prec, xy_prod + &y0);
 
         v.push((xtemp.clone(), ytemp.clone()));
         i += 1;
@@ -239,6 +245,9 @@ pub fn iterate_all_float(x0: Float, y0: Float, max_iterations: u32) -> Vec<(Floa
 
         x = xtemp;
         y = ytemp;
+
+        // Reuse magnitude_squared for next iteration check
+        magnitude_squared.assign(&x * &x + &y * &y);
     }
 
     v
